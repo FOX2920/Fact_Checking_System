@@ -28,7 +28,7 @@ The system consists of three main components:
 1. Clone this repository to your local machine.
 
     ```bash
-    git clone https://github.com/your-username/fact-checking-system.git
+    git clone https://github.com/FOX2920/Fact_Checking_System.git
     ```
 
 2. Install the required Python dependencies.
