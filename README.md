@@ -56,6 +56,25 @@ The system consists of three main components:
 
 3. Open your web browser and navigate to `http://localhost:8501` to access the Streamlit app.
 
+## Dockerization
+
+A Dockerfile has been added to simplify deployment of the Fact-Checking System.
+
+### Building the Docker Image
+
+To build the Docker image, navigate to the root directory of the project where the Dockerfile is located and run the following command:
+
+```bash
+docker build -t Fact-Checking-System .
+```
+
+### Running the Docker Container
+Once the image is built, you can run the Docker container with the following command:
+```bash
+docker run -p 8501:8501 fact-checking-system
+```
+This will start the containerized application, and you can access it through `http://localhost:8501` in your web browser.
+
 ## Usage
 
 1. Input the context and claim in the respective fields provided by the Streamlit interface.
