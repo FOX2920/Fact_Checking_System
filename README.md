@@ -34,7 +34,7 @@ The system consists of three main components:
 2. Install the required Python dependencies.
 
     ```bash
-    cd <path/to/folder>fact-checking-system
+    cd <path/to/folder>Fact_Checking_System
     pip install -r requirements.txt
     ```
 
