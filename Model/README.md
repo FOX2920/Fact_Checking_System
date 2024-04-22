@@ -1,0 +1,1 @@
+# Download file model **Checkpoint.pt** in [Google drive](https://drive.google.com/drive/u/0/folders/1zAjAad5J3obOJgioptqEcA-Ta9l5OTul?fbclid=IwAR0Qskn-DcTTrN_LhRd6uRs1LPwjhe5fjDWJuXEay9iuW07TKeijV3lDrJU) and put it in this folder
