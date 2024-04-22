@@ -3,6 +3,9 @@ pandas==2.0.3
 numpy==1.23.5
 scikit-learn
 nltk==3.8.1
-pyvi
+pyvi==0.1.1
 torch==2.2.2
 transformers==4.39.3
+Flask==3.0.3
+pymongo==4.6.3
+requests==2.31.0
