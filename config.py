@@ -1,1 +1,1 @@
-access_token = "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"
+hf_token = "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"
