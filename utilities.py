@@ -9,12 +9,13 @@ from Mbert import MBERTClassifier
 from evidence_retrieval import evidence_top_n, similarities
 import gc
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-modelname = "bert-base-multilingual-cased"
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
+modelname = "SonFox2920/MBert_FC" # Model bert đã dc fine-tune
 tokenizer = AutoTokenizer.from_pretrained(modelname)
 mbert = AutoModel.from_pretrained(modelname).to(device)
 model = MBERTClassifier(mbert, num_classes=3).to(device)
-model.load_state_dict(torch.load('Model/checkpoint.pt'))
+#model.load_state_dict(torch.load('Model/checkpoint.pt', map_location=device))
 
 # Hàm để dự đoán nhãn
 def predict(context, claim):
