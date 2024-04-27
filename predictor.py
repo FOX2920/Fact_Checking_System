@@ -6,6 +6,8 @@ from nltk.tokenize import sent_tokenize
 
 st.set_page_config(layout="wide")
 
+hf_token = st.secrets["HUGGINGFACE_TOKEN"]["token"]
+os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_token
 
 def creds_entered() :
     if st.session_state["user"].strip() == "admin" and st.session_state["passwd"].strip() == "admin":
