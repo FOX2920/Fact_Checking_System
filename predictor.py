@@ -4,6 +4,7 @@ import pandas as pd
 from utilities import predict
 from nltk.tokenize import sent_tokenize
 
+from config import hf_token
 st.set_page_config(layout="wide")
 
 hf_token = st.secrets["HUGGINGFACE_TOKEN"]["token"]
