@@ -6,6 +6,7 @@ from nltk.tokenize import sent_tokenize
 
 from config import hf_token
 st.set_page_config(layout="wide")
+import os
 
 hf_token = st.secrets["HUGGINGFACE_TOKEN"]["token"]
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_token
