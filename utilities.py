@@ -7,7 +7,7 @@ import torch
 from transformers import AutoModel, AutoTokenizer
 from Mbert import MBERTClassifier
 from evidence_retrieval import evidence_top_n, similarities
-import gc
+#import gc
 from config import hf_token
 
 #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -21,9 +21,9 @@ model = MBERTClassifier(mbert, num_classes=3).to(device)
 # Hàm để dự đoán nhãn
 def predict(context, claim):
 
-    gc.collect()
-    torch.cuda.empty_cache()
-    torch.cuda.ipc_collect()
+#    gc.collect()
+#    torch.cuda.empty_cache()
+#    torch.cuda.ipc_collect()
 
     evidence_top5, top5_consine = evidence_top_n(context, claim)
     evidence_top1, top1_consine, rank_5 = similarities(evidence_top5, claim, top5_consine)
