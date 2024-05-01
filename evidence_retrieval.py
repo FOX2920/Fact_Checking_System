@@ -16,7 +16,6 @@ from transformers import BertTokenizer, BertModel
 
 # NLP libraries
 import nltk
-nltk.download('punkt')
 
 # Multithreading libraries
 from multiprocessing import Pool, cpu_count
