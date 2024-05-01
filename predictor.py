@@ -11,6 +11,10 @@ import os
 hf_token = st.secrets["HUGGINGFACE_TOKEN"]["token"]
 os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_token
 
+
+# Define a global DataFrame to store annotated data
+annotated_data = pd.DataFrame(columns=['Username', 'Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
+
 def creds_entered() :
     if st.session_state["user"].strip() == "admin" and st.session_state["passwd"].strip() == "admin":
         st.session_state["authenticated"] = True
@@ -113,42 +117,7 @@ def create_expander_with_check_button(title, context, predict_func):
             st.session_state[claim_key] = False
             evidence_selected = []
 
-# Define a global DataFrame to store annotated data
-annotated_data = pd.DataFrame(columns=['Username', 'Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
-
-def save_data(uploaded_file, default_ID, default_title, default_link):
-    global annotated_data
-    annotated_data = annotated_data.append({
-        'Username': st.session_state["user"],
-        'Context': default_context,
-        'Claim': st.session_state.get("NEI_input", ""),
-        'Label': 'NEI',
-        'Evidence': st.session_state.get("NEI_evidence_selected", ""),
-        'Title': default_title,
-        'Link': default_link
-    }, ignore_index=True)
-    
-    annotated_data = annotated_data.append({
-        'Username': st.session_state["user"],
-        'Context': default_context,
-        'Claim': st.session_state.get("REFUTED_input", ""),
-        'Label': 'REFUTED',
-        'Evidence': st.session_state.get("REFUTED_evidence_selected", ""),
-        'Title': default_title,
-        'Link': default_link
-    }, ignore_index=True)
-    
-    annotated_data = annotated_data.append({
-        'Username': st.session_state["user"],
-        'Context': default_context,
-        'Claim': st.session_state.get("SUPPORTED_input", ""),
-        'Label': 'SUPPORTED',
-        'Evidence': st.session_state.get("SUPPORTED_evidence_selected", ""),
-        'Title': default_title,
-        'Link': default_link
-    }, ignore_index=True)
   
-
 
 def predictor_app():
     if authenticate_user():
@@ -245,15 +214,7 @@ def predictor_app():
 
 
                     with save:
-                        save_button = st.button("Save")
-                        if save_button:
-                                        save_data(uploaded_file, default_ID, default_title, default_link)
-                                        # Reset claim inputs
-                                        st.session_state["NEI_input"] = ""
-                                        st.session_state["REFUTED_input"] = ""
-                                        st.session_state["SUPPORTED_input"] = ""
-                                        # Rerun to update data display
-                                        st.experimental_rerun()
+                        st.button("Save")
 
                     with close:
                         cl = st.button("Close")
