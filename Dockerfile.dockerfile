@@ -13,7 +13,8 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt \
+    && python -m nltk.downloader punkt
 
 # Expose the Streamlit port
 EXPOSE 8501
