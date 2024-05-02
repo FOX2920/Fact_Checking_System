@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 #import requests
 import pandas as pd
@@ -82,11 +80,6 @@ def get_sentences(context):
     sentences = sent_tokenize(context)
     return sentences
 
-def clear_text():
-    st.session_state['NEI_input'] = ""
-    st.session_state['REFUTED_input'] = ""
-    st.session_state['SUPPORTED_input']= ""
-
 def create_expander_with_check_button(title, context, predict_func):
     claim_key = f"{title.upper()}_claim_entered"
     evidence_key = f"{title.upper()}_evidence_selected"
@@ -110,15 +103,21 @@ def create_expander_with_check_button(title, context, predict_func):
             st.warning("Please enter a claim.")
             
             # Reset session state variables when claim is not entered
-            st.session_state[claim_key]= 'False'
+            st.session_state[claim_key]= ''
 
 
 
-# Define a global DataFrame to store annotated data
-annotated_data = pd.DataFrame(columns=['Username', 'Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
+if 'annotated_data' not in st.session_state:
+    st.session_state['annotated_data'] = pd.DataFrame(columns=['Username', 'Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
+
+annotated_data = st.session_state['annotated_data']
 
 
-def save_data(context,  default_title, default_link, df):
+
+def save_data(context, default_title, default_link):
+    # Lấy DataFrame từ session state
+    annotated_data = st.session_state['annotated_data']
+    
     # Iterate over the claims and save them to the DataFrame
     for label in ['NEI', 'REFUTED', 'SUPPORTED']:
         claim_key = f"{label}_input"
@@ -130,7 +129,11 @@ def save_data(context,  default_title, default_link, df):
             evidence = st.session_state.get(evidence_key, [])
             
             # Append data to the DataFrame
-            df.loc[len(df)] = ['admin', context, claim, label, evidence, default_title, default_link]
+            annotated_data.loc[len(annotated_data)] = ['admin', context, claim, label, evidence, default_title, default_link]
+    
+    # Lưu DataFrame vào session state
+    st.session_state['annotated_data'] = annotated_data
+
 
 
   
@@ -241,8 +244,9 @@ def predictor_app():
                             # Check if all claims are entered before saving
                             if all_claims_entered and all_evidence_selected:
                                 # Save data
-                                save_data(default_context, default_title, default_link, annotated_data )
+                                save_data(default_context, default_title, default_link)
                                 error = 'success'
+                                
                             else:
                                 error = 'save_fail'
                                 
