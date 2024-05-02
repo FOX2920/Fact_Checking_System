@@ -184,16 +184,16 @@ def predictor_app():
                     with link:
                         st.text_input("Link:",value=default_link)
                     
-                c2 = st.container(border=True)
-                with c2:
-                    nv, ev = st.columns(2)
-                    with nv:
-                        st.title("Nhiệm vụ")
-                        st.write("Đây là nhiệm vụ tạo dữ liệu Fact Checking, với đoạn Context cho trước: annotater nhấn để đặt câu cho vô Câu Claim đặt câu cho mỗi nhãn suy luận, lần lượt với 3 nhãn Supports, Refutes và NEI (Not Enough Information). Mỗi đoạn context phải đặt ít nhất 5 câu với mỗi loại claim", height=100)
-                    # with ev:
-                    #     st.title("Info")
-                    #     st.write(f"Username: {st.session_state.get('username', '')}")
-                    #     st.write("Bank_account:  111111111111")
+                # c2 = st.container(border=True)
+                # with c2:
+                #     nv, ev = st.columns(2)
+                #     with nv:
+                #         st.title("Nhiệm vụ")
+                #         st.write("Đây là nhiệm vụ tạo dữ liệu Fact Checking, với đoạn Context cho trước: annotater nhấn để đặt câu cho vô Câu Claim đặt câu cho mỗi nhãn suy luận, lần lượt với 3 nhãn Supports, Refutes và NEI (Not Enough Information). Mỗi đoạn context phải đặt ít nhất 5 câu với mỗi loại claim", height=100)
+                #     # with ev:
+                #     #     st.title("Info")
+                #     #     st.write(f"Username: {st.session_state.get('username', '')}")
+                #     #     st.write("Bank_account:  111111111111")
                 
                 c3 = st.container(border=True)
                 with c3:
