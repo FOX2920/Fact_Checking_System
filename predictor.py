@@ -1,19 +1,12 @@
+
+
 import streamlit as st
 #import requests
 import pandas as pd
 from utilities import predict
 from nltk.tokenize import sent_tokenize
 
-from config import hf_token
 st.set_page_config(layout="wide")
-import os
-
-hf_token = st.secrets["HUGGINGFACE_TOKEN"]["token"]
-os.environ["HUGGINGFACEHUB_API_TOKEN"] = hf_token
-
-
-# Define a global DataFrame to store annotated data
-annotated_data = pd.DataFrame(columns=['Username', 'Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
 
 def creds_entered() :
     if st.session_state["user"].strip() == "admin" and st.session_state["passwd"].strip() == "admin":
@@ -39,7 +32,6 @@ def authenticate_user():
     else:
         return True
         
-
 
 # def predict(context, claim):
 #     url = 'http://127.0.0.1:8080/predict'
@@ -90,37 +82,62 @@ def get_sentences(context):
     sentences = sent_tokenize(context)
     return sentences
 
+def clear_text():
+    st.session_state['NEI_input'] = ""
+    st.session_state['REFUTED_input'] = ""
+    st.session_state['SUPPORTED_input']= ""
+
 def create_expander_with_check_button(title, context, predict_func):
     claim_key = f"{title.upper()}_claim_entered"
     evidence_key = f"{title.upper()}_evidence_selected"
-
+    claim_input_key = f'{title}_input'
     with st.expander(title):
-        claim = st.text_input(f'Claim {title.upper()}', max_chars=500, key=f'{title}_input')
+        claim = st.text_input(f'Claim {title.upper()}', max_chars=500, key=claim_input_key)
         if claim:
             result = predict_func(context, claim)
             result_form(result)
             
             # Update session state variable when claim is entered
             st.session_state[claim_key] = True
-            
             if result and 'evidence' in result:
                 # Get sentences from context
                 sentences = get_sentences(context)
                 
                 # Display sentences for evidence selection
-                evidence_selected = st.multiselect("Select evidence:", sentences, key=evidence_key)
+                st.multiselect("Select evidence:", sentences, key=evidence_key)
                 
         else:
             st.warning("Please enter a claim.")
             
             # Reset session state variables when claim is not entered
-            st.session_state[claim_key] = False
-            evidence_selected = []
+            st.session_state[claim_key]= 'False'
+
+
+
+# Define a global DataFrame to store annotated data
+annotated_data = pd.DataFrame(columns=['Username', 'Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
+
+
+def save_data(context,  default_title, default_link, df):
+    # Iterate over the claims and save them to the DataFrame
+    for label in ['NEI', 'REFUTED', 'SUPPORTED']:
+        claim_key = f"{label}_input"
+        evidence_key = f"{label}_evidence_selected"
+        
+        # Check if the claim is entered
+        if st.session_state.get(claim_key, ''):
+            claim = st.session_state[claim_key]
+            evidence = st.session_state.get(evidence_key, [])
+            
+            # Append data to the DataFrame
+            df.loc[len(df)] = ['admin', context, claim, label, evidence, default_title, default_link]
+
 
   
 
 def predictor_app():
     if authenticate_user():
+        tab1, tab2 = st.tabs(["Annotate", "Save"])
         st.sidebar.title("Dataset Upload")
         uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
 
@@ -131,13 +148,14 @@ def predictor_app():
             max_index = len(df) - 1
             current_index = st.session_state.get("current_index", 0)
             current_row = df.iloc[current_index]
-            
+        
+         
             default_context = current_row['Summary']
             default_ID = current_row['ID']
             default_title = current_row['Title']
             default_link = current_row['URL']
 
-            
+        with tab1:       
             st.title("Fact Checking annotation app")
             c1 = st.container(border=True)
             with c1:
@@ -167,7 +185,7 @@ def predictor_app():
                 left_column, right_column = st.columns([0.45, 0.55])
                 with left_column:
                     st.title("Context")
-                    c3_1 = st.container(border=True, height = 750)
+                    c3_1 = st.container(border=True, height = 770)
                     with c3_1:
                         st.write(f'{default_context}')
         
@@ -184,6 +202,10 @@ def predictor_app():
                     all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
                                           st.session_state.get("REFUTED_claim_entered", False) and \
                                           st.session_state.get("SUPPORTED_claim_entered", False)
+                    
+                    all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and  \
+                             st.session_state.get("REFUTED_evidence_selected", []) and \
+                             st.session_state.get("SUPPORTED_evidence_selected", []))
                     
                     previous, next_, save, close = st.columns(4)
                     error = ''
@@ -214,7 +236,16 @@ def predictor_app():
 
 
                     with save:
-                        st.button("Save")
+                        save_button = st.button("Save")
+                        if save_button:
+                            # Check if all claims are entered before saving
+                            if all_claims_entered and all_evidence_selected:
+                                # Save data
+                                save_data(default_context, default_title, default_link, annotated_data )
+                                error = 'success'
+                            else:
+                                error = 'save_fail'
+                                
 
                     with close:
                         cl = st.button("Close")
@@ -223,7 +254,17 @@ def predictor_app():
                             st.experimental_rerun()
 
                     if error == 'navigate':
-                        st.warning("Please enter all claims before navigating.")
+                        st.warning("Please enter all claims and select all evidence before navigating.")
+                    elif error == 'success':
+                         st.success("Data saved successfully.")
+                    else:
+                        st.warning("Please enter all claims and select all evidence before saving.")
+            with tab2:
+                st.title("Saved Annotations")
+                if annotated_data.empty:
+                    st.info("No annotations saved yet.")
+                else:
+                    st.dataframe(annotated_data)
                     
 
 if __name__ == '__main__':
