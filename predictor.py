@@ -158,116 +158,116 @@ def predictor_app():
             default_title = current_row['Title']
             default_link = current_row['URL']
 
-            with tab1:       
-                st.title("Fact Checking annotation app")
-                c1 = st.container(border=True)
-                with c1:
-                    ten_file, id_cau, chu_de, link = st.columns(4)
-                    with ten_file:
-                        st.text_input("Tên File:",value=uploaded_file.name)
-                    with id_cau:
-                        st.text_input("ID Context: ",value=default_ID)
-                    with chu_de:
-                        st.text_input("Chủ đề:", value=default_title)
-                    with link:
-                        st.text_input("Link:",value=default_link)
-                    
-                c2 = st.container(border=True)
-                with c2:
-                    nv, ev = st.columns(2)
-                    with nv:
-                        st.title("Nhiệm vụ")
-                        st.write("Đây là nhiệm vụ tạo dữ liệu Fact Checking, với đoạn Context cho trước: annotater nhấn để đặt câu cho vô Câu Claim đặt câu cho mỗi nhãn suy luận, lần lượt với 3 nhãn Supports, Refutes và NEI (Not Enough Information). Mỗi đoạn context phải đặt ít nhất 5 câu với mỗi loại claim", height=100)
-                    # with ev:
-                    #     st.title("Info")
-                    #     st.write(f"Username: {st.session_state.get('username', '')}")
-                    #     st.write("Bank_account:  111111111111")
+        with tab1:       
+            st.title("Fact Checking annotation app")
+            c1 = st.container(border=True)
+            with c1:
+                ten_file, id_cau, chu_de, link = st.columns(4)
+                with ten_file:
+                    st.text_input("Tên File:",value=uploaded_file.name)
+                with id_cau:
+                    st.text_input("ID Context: ",value=default_ID)
+                with chu_de:
+                    st.text_input("Chủ đề:", value=default_title)
+                with link:
+                    st.text_input("Link:",value=default_link)
                 
-                c3 = st.container(border=True)
-                with c3:
-                    left_column, right_column = st.columns([0.45, 0.55])
-                    with left_column:
-                        st.title("Context")
-                        c3_1 = st.container(border=True, height = 770)
-                        with c3_1:
-                            st.write(f'{default_context}')
+            c2 = st.container(border=True)
+            with c2:
+                nv, ev = st.columns(2)
+                with nv:
+                    st.title("Nhiệm vụ")
+                    st.write("Đây là nhiệm vụ tạo dữ liệu Fact Checking, với đoạn Context cho trước: annotater nhấn để đặt câu cho vô Câu Claim đặt câu cho mỗi nhãn suy luận, lần lượt với 3 nhãn Supports, Refutes và NEI (Not Enough Information). Mỗi đoạn context phải đặt ít nhất 5 câu với mỗi loại claim", height=100)
+                # with ev:
+                #     st.title("Info")
+                #     st.write(f"Username: {st.session_state.get('username', '')}")
+                #     st.write("Bank_account:  111111111111")
             
-                    with right_column:
-                        st.title("Claim")
-                        c3_2 = st.container(border=True, height = 650)
-                        with c3_2:
-                            # Sử dụng hàm để tạo các expander với nút kiểm tra tương ứng
-                            create_expander_with_check_button("NEI", default_context, predict)
-                            create_expander_with_check_button("REFUTED", default_context, predict)
-                            create_expander_with_check_button("SUPPORTED", default_context, predict)
+            c3 = st.container(border=True)
+            with c3:
+                left_column, right_column = st.columns([0.45, 0.55])
+                with left_column:
+                    st.title("Context")
+                    c3_1 = st.container(border=True, height = 770)
+                    with c3_1:
+                        st.write(f'{default_context}')
+        
+                with right_column:
+                    st.title("Claim")
+                    c3_2 = st.container(border=True, height = 650)
+                    with c3_2:
+                        # Sử dụng hàm để tạo các expander với nút kiểm tra tương ứng
+                        create_expander_with_check_button("NEI", default_context, predict)
+                        create_expander_with_check_button("REFUTED", default_context, predict)
+                        create_expander_with_check_button("SUPPORTED", default_context, predict)
+                
+                    # Check if all claims are entered
+                    all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
+                                          st.session_state.get("REFUTED_claim_entered", False) and \
+                                          st.session_state.get("SUPPORTED_claim_entered", False)
                     
-                        # Check if all claims are entered
-                        all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
-                                              st.session_state.get("REFUTED_claim_entered", False) and \
-                                              st.session_state.get("SUPPORTED_claim_entered", False)
-                        
-                        all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and  \
-                                 st.session_state.get("REFUTED_evidence_selected", []) and \
-                                 st.session_state.get("SUPPORTED_evidence_selected", []))
-                        
-                        previous, next_, save, close = st.columns(4)
-                        error = ''
-                        with previous:
-                            pr = st.button("Previous")
-                            if pr and all_claims_entered:
-                                if current_index > 0:
-                                    st.session_state["current_index"] = current_index - 1
-                                    st.experimental_rerun()
-                                else:
-                                    st.session_state["current_index"] = max_index
-                                    st.experimental_rerun()
-                            elif pr and not all_claims_entered:
-                                error = 'navigate'
-                        
-                        with next_:
-                            next_b = st.button("Next")
-                            if next_b and all_claims_entered:
-                                if current_index < max_index:
-                                    st.session_state["current_index"] = current_index + 1
-                                    st.experimental_rerun()
-                                else:
-                                    st.session_state["current_index"] = 0
-                                    st.experimental_rerun()
-                            elif next_b and not all_claims_entered:
-                                error = 'navigate'
-                                
-    
-    
-                        with save:
-                            save_button = st.button("Save")
-                            if save_button:
-                                # Check if all claims are entered before saving
-                                if all_claims_entered and all_evidence_selected:
-                                    # Save data
-                                    save_data(default_context, default_title, default_link)
-                                    error = 'success'
-                                    
-                                else:
-                                    error = 'save_fail'
-                                    
-    
-                        with close:
-                            cl = st.button("Close")
-                            if cl:
-                                st.session_state["authenticated"] = False
+                    all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and  \
+                             st.session_state.get("REFUTED_evidence_selected", []) and \
+                             st.session_state.get("SUPPORTED_evidence_selected", []))
+                    
+                    previous, next_, save, close = st.columns(4)
+                    error = ''
+                    with previous:
+                        pr = st.button("Previous")
+                        if pr and all_claims_entered:
+                            if current_index > 0:
+                                st.session_state["current_index"] = current_index - 1
                                 st.experimental_rerun()
-    
-                        if error == 'navigate':
-                            st.warning("Please enter all claims and select all evidence before navigating.")
-                        elif error == 'success':
-                             st.success("Data saved successfully.")
-                        else:
-                            st.warning("Please enter all claims and select all evidence before saving.")
-                with tab2:
-                    st.title("Saved Annotations")
-                    if annotated_data.empty:
-                        st.info("No annotations saved yet.")
+                            else:
+                                st.session_state["current_index"] = max_index
+                                st.experimental_rerun()
+                        elif pr and not all_claims_entered:
+                            error = 'navigate'
+                    
+                    with next_:
+                        next_b = st.button("Next")
+                        if next_b and all_claims_entered:
+                            if current_index < max_index:
+                                st.session_state["current_index"] = current_index + 1
+                                st.experimental_rerun()
+                            else:
+                                st.session_state["current_index"] = 0
+                                st.experimental_rerun()
+                        elif next_b and not all_claims_entered:
+                            error = 'navigate'
+                            
+
+
+                    with save:
+                        save_button = st.button("Save")
+                        if save_button:
+                            # Check if all claims are entered before saving
+                            if all_claims_entered and all_evidence_selected:
+                                # Save data
+                                save_data(default_context, default_title, default_link)
+                                error = 'success'
+                                
+                            else:
+                                error = 'save_fail'
+                                
+
+                    with close:
+                        cl = st.button("Close")
+                        if cl:
+                            st.session_state["authenticated"] = False
+                            st.experimental_rerun()
+
+                    if error == 'navigate':
+                        st.warning("Please enter all claims and select all evidence before navigating.")
+                    elif error == 'success':
+                         st.success("Data saved successfully.")
                     else:
-                        st.dataframe(annotated_data)
+                        st.warning("Please enter all claims and select all evidence before saving.")
+            with tab2:
+                st.title("Saved Annotations")
+                if annotated_data.empty:
+                    st.info("No annotations saved yet.")
+                else:
+                    st.dataframe(annotated_data)
 if __name__ == '__main__':
     predictor_app()
