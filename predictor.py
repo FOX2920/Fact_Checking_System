@@ -158,7 +158,19 @@ def predictor_app():
             default_title = current_row['Title']
             default_link = current_row['URL']
 
-            with tab1:       
+        with tab1:
+            if uploaded_file is None:
+                c2 = st.container(border=True)
+                with c2:
+                    nv, ev = st.columns(2)
+                    with nv:
+                        st.title("Nhiệm vụ")
+                        st.write("Đây là nhiệm vụ tạo dữ liệu Fact Checking, với đoạn Context cho trước: annotater nhấn để đặt câu cho vô Câu Claim đặt câu cho mỗi nhãn suy luận, lần lượt với 3 nhãn Supports, Refutes và NEI (Not Enough Information). Mỗi đoạn context phải đặt ít nhất 5 câu với mỗi loại claim", height=100)
+                    # with ev:
+                    #     st.title("Info")
+                    #     st.write(f"Username: {st.session_state.get('username', '')}")
+                    #     st.write("Bank_account:  111111111111")
+            else:
                 st.title("Fact Checking annotation app")
                 c1 = st.container(border=True)
                 with c1:
@@ -263,11 +275,11 @@ def predictor_app():
                              st.success("Data saved successfully.")
                         else:
                             st.warning("Please enter all claims and select all evidence before saving.")
-                with tab2:
-                    st.title("Saved Annotations")
-                    if annotated_data.empty:
-                        st.info("No annotations saved yet.")
-                    else:
-                        st.dataframe(annotated_data)
+        with tab2:
+            st.title("Saved Annotations")
+            if annotated_data.empty:
+                st.info("No annotations saved yet.")
+            else:
+                st.dataframe(annotated_data)
 if __name__ == '__main__':
     predictor_app()
