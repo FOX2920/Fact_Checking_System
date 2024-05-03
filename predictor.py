@@ -141,12 +141,12 @@ def save_data(context, default_title, default_link):
     st.session_state['annotated_data'] = annotated_data
 
 def enough_claims_entered():
-    # Check if at least five claims are entered for each label with each title
+    # Kiểm tra xem đã đủ ít nhất năm claim cho mỗi nhãn với mỗi title chưa
     nei_claims = annotated_data[(annotated_data['Label'] == 'NEI')].groupby('Title')['Claim'].count()
     refuted_claims = annotated_data[(annotated_data['Label'] == 'REFUTED')].groupby('Title')['Claim'].count()
     supported_claims = annotated_data[(annotated_data['Label'] == 'SUPPORTED')].groupby('Title')['Claim'].count()
 
-    # Check if all titles have at least five claims for each label
+    # Kiểm tra xem tất cả các title có ít nhất năm claim cho mỗi nhãn không
     return (nei_claims >= 5).all() and (refuted_claims >= 5).all() and (supported_claims >= 5).all()
 
 
@@ -240,27 +240,29 @@ def predictor_app():
                         error = ''
                         with previous:
                             pr = st.button("Previous")
-                            if pr and enough_claims_entered():
-                                if current_index > 0:
-                                    st.session_state["current_index"] = current_index - 1
-                                    st.experimental_rerun()
-                                else:
-                                    st.session_state["current_index"] = max_index
-                                    st.experimental_rerun()
-                            elif pr and not all_claims_entered:
-                                error = 'n_enough'
+                            if pr:
+                                if enough_claims_entered():
+                                    if current_index > 0:
+                                        st.session_state["current_index"] = current_index - 1
+                                        st.experimental_rerun()
+                                    else:
+                                        st.session_state["current_index"] = max_index
+                                        st.experimental_rerun()
+                                else
+                                    error = 'n_enough'
                         
                         with next_:
                             next_b = st.button("Next")
-                            if next_b and enough_claims_entered():
-                                if current_index < max_index:
-                                    st.session_state["current_index"] = current_index + 1
-                                    st.experimental_rerun()
+                            if next_b:
+                                if enough_claims_entered():
+                                    if current_index < max_index:
+                                        st.session_state["current_index"] = current_index + 1
+                                        st.experimental_rerun()
+                                    else:
+                                        st.session_state["current_index"] = 0
+                                        st.experimental_rerun()
                                 else:
-                                    st.session_state["current_index"] = 0
-                                    st.experimental_rerun()
-                            elif next_b and not all_claims_entered:
-                                error = 'n_enough'
+                                    error = 'n_enough'
                                 
         
         
