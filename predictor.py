@@ -140,6 +140,14 @@ def save_data(context, default_title, default_link):
     # Lưu DataFrame vào session state
     st.session_state['annotated_data'] = annotated_data
 
+def enough_claims_entered():
+    # Check if at least five claims are entered for each label with each title
+    nei_claims = annotated_data[(annotated_data['Label'] == 'NEI')].groupby('Title')['Claim'].count()
+    refuted_claims = annotated_data[(annotated_data['Label'] == 'REFUTED')].groupby('Title')['Claim'].count()
+    supported_claims = annotated_data[(annotated_data['Label'] == 'SUPPORTED')].groupby('Title')['Claim'].count()
+
+    # Check if all titles have at least five claims for each label
+    return (nei_claims >= 5).all() and (refuted_claims >= 5).all() and (supported_claims >= 5).all()
 
 
   
@@ -171,7 +179,7 @@ def predictor_app():
                     nv, ev = st.columns(2)
                     with nv:
                         st.title("Nhiệm vụ")
-                        st.write("Đây là nhiệm vụ tạo dữ liệu Fact Checking, với đoạn Context cho trước: annotater nhấn để đặt câu cho vô Câu Claim đặt câu cho mỗi nhãn suy luận, lần lượt với 3 nhãn Supports, Refutes và NEI (Not Enough Information). Mỗi đoạn context phải đặt ít nhất 5 câu với mỗi loại claim", height=100)
+                        st.write("Đây là nhiệm vụ tạo dữ liệu Fact Checking, với đoạn Context cho trước: annotater nhấn để đặt câu cho vô Câu Claim đặt câu cho mỗi nhãn suy luận, lần lượt với 3 nhãn Supports, Refutes và NEI (Not Enough Information). Mỗi đoạn context cần phải đặt ít nhất 5 câu với mỗi loại claim", height=100)
                     # with ev:
                     #     st.title("Info")
                     #     st.write(f"Username: {st.session_state.get('username', '')}")
@@ -233,24 +241,30 @@ def predictor_app():
                         with previous:
                             pr = st.button("Previous")
                             if pr and all_claims_entered:
-                                if current_index > 0:
-                                    st.session_state["current_index"] = current_index - 1
-                                    st.experimental_rerun()
+                                if enough_claims_entered():
+                                    if current_index > 0:
+                                        st.session_state["current_index"] = current_index - 1
+                                        st.experimental_rerun()
+                                    else:
+                                        st.session_state["current_index"] = max_index
+                                        st.experimental_rerun()
                                 else:
-                                    st.session_state["current_index"] = max_index
-                                    st.experimental_rerun()
+                                    error = 'n_enough'
                             elif pr and not all_claims_entered:
                                 error = 'navigate'
                         
                         with next_:
                             next_b = st.button("Next")
                             if next_b and all_claims_entered:
-                                if current_index < max_index:
-                                    st.session_state["current_index"] = current_index + 1
-                                    st.experimental_rerun()
+                                if enough_claims_entered():
+                                    if current_index < max_index:
+                                        st.session_state["current_index"] = current_index + 1
+                                        st.experimental_rerun()
+                                    else:
+                                        st.session_state["current_index"] = 0
+                                        st.experimental_rerun()
                                 else:
-                                    st.session_state["current_index"] = 0
-                                    st.experimental_rerun()
+                                    error = 'n_enough'
                             elif next_b and not all_claims_entered:
                                 error = 'navigate'
                                 
@@ -279,6 +293,8 @@ def predictor_app():
                             st.warning("Please enter all claims and select all evidence before navigating.")
                         elif error == 'success':
                              st.success("Data saved successfully.")
+                        elif error == 'n_enough':
+                             st.warning("Enter at least five claims for each label for this title before navigating.")
                         else:
                             st.warning("Please enter all claims and select all evidence before saving.")
         with tab2:
