@@ -248,7 +248,7 @@ def predictor_app():
                                     else:
                                         st.session_state["current_index"] = max_index
                                         st.experimental_rerun()
-                                else
+                                else:
                                     error = 'n_enough'
                         
                         with next_:
