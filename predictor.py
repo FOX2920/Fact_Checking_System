@@ -240,33 +240,27 @@ def predictor_app():
                         error = ''
                         with previous:
                             pr = st.button("Previous")
-                            if pr and all_claims_entered:
-                                if enough_claims_entered():
-                                    if current_index > 0:
-                                        st.session_state["current_index"] = current_index - 1
-                                        st.experimental_rerun()
-                                    else:
-                                        st.session_state["current_index"] = max_index
-                                        st.experimental_rerun()
+                            if pr and enough_claims_entered():
+                                if current_index > 0:
+                                    st.session_state["current_index"] = current_index - 1
+                                    st.experimental_rerun()
                                 else:
-                                    error = 'n_enough'
+                                    st.session_state["current_index"] = max_index
+                                    st.experimental_rerun()
                             elif pr and not all_claims_entered:
-                                error = 'navigate'
+                                error = 'n_enough'
                         
                         with next_:
                             next_b = st.button("Next")
-                            if next_b and all_claims_entered:
-                                if enough_claims_entered():
-                                    if current_index < max_index:
-                                        st.session_state["current_index"] = current_index + 1
-                                        st.experimental_rerun()
-                                    else:
-                                        st.session_state["current_index"] = 0
-                                        st.experimental_rerun()
+                            if next_b and enough_claims_entered():
+                                if current_index < max_index:
+                                    st.session_state["current_index"] = current_index + 1
+                                    st.experimental_rerun()
                                 else:
-                                    error = 'n_enough'
+                                    st.session_state["current_index"] = 0
+                                    st.experimental_rerun()
                             elif next_b and not all_claims_entered:
-                                error = 'navigate'
+                                error = 'n_enough'
                                 
         
         
@@ -289,9 +283,7 @@ def predictor_app():
                                 st.session_state["authenticated"] = False
                                 st.experimental_rerun()
         
-                        if error == 'navigate':
-                            st.warning("Please enter all claims and select all evidence before navigating.")
-                        elif error == 'success':
+                        if error == 'success':
                              st.success("Data saved successfully.")
                         elif error == 'n_enough':
                              st.warning("Enter at least five claims for each label for this title before navigating.")
