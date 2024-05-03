@@ -140,14 +140,16 @@ def save_data(context, default_title, default_link):
     # Lưu DataFrame vào session state
     st.session_state['annotated_data'] = annotated_data
 
-def enough_claims_entered():
-    # Kiểm tra xem đã đủ ít nhất năm claim cho mỗi nhãn với mỗi title chưa
-    nei_claims = annotated_data[(annotated_data['Label'] == 'NEI')].groupby('Title')['Claim'].count()
-    refuted_claims = annotated_data[(annotated_data['Label'] == 'REFUTED')].groupby('Title')['Claim'].count()
-    supported_claims = annotated_data[(annotated_data['Label'] == 'SUPPORTED')].groupby('Title')['Claim'].count()
+def enough_claims_entered(title):
+    # Lấy DataFrame từ session state
+    annotated_data = st.session_state['annotated_data']
+    
+    # Kiểm tra xem đã đủ ít nhất năm claim cho mỗi nhãn với title cụ thể không
+    nei_claims = annotated_data[(annotated_data['Label'] == 'NEI') & (annotated_data['Title'] == title)].shape[0]
+    refuted_claims = annotated_data[(annotated_data['Label'] == 'REFUTED') & (annotated_data['Title'] == title)].shape[0]
+    supported_claims = annotated_data[(annotated_data['Label'] == 'SUPPORTED') & (annotated_data['Title'] == title)].shape[0]
 
-    # Kiểm tra xem tất cả các title có ít nhất năm claim cho mỗi nhãn không
-    return (nei_claims >= 5).all() and (refuted_claims >= 5).all() and (supported_claims >= 5).all()
+    return nei_claims >= 5 and refuted_claims >= 5 and supported_claims >= 5
 
 
   
@@ -241,7 +243,7 @@ def predictor_app():
                         with previous:
                             pr = st.button("Previous")
                             if pr:
-                                if enough_claims_entered():
+                                if enough_claims_entered(default_title):
                                     if current_index > 0:
                                         st.session_state["current_index"] = current_index - 1
                                         st.experimental_rerun()
@@ -254,7 +256,7 @@ def predictor_app():
                         with next_:
                             next_b = st.button("Next")
                             if next_b:
-                                if enough_claims_entered():
+                                if enough_claims_entered(default_title):
                                     if current_index < max_index:
                                         st.session_state["current_index"] = current_index + 1
                                         st.experimental_rerun()
