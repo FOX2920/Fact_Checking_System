@@ -87,7 +87,7 @@ def create_expander_with_check_button(label, title, context, predict_func):
 
     # Lấy DataFrame từ session state
     annotated_data = st.session_state['annotated_data']
-    with st.expander(label):
+    with st.expander(label, expanded=True):
         claim = st.text_input(f'Claim {label.upper()}', max_chars=500, key=claim_input_key)
         if claim:
             if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == title))].empty:
