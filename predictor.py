@@ -91,7 +91,7 @@ def create_expander_with_check_button(label, title, context, predict_func):
         claim = st.text_input(f'Claim {label.upper()}', max_chars=500, key=claim_input_key)
         if claim:
             if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == title))].empty:
-                st.warning(f"This claim with label '{label}' and title '{default_title}' already exists.")
+                st.warning(f"This claim with label '{label}' and title '{title}' already exists.")
             else:
                 result = predict_func(context, claim)
                 result_form(result)
