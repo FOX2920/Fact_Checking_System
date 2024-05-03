@@ -80,24 +80,30 @@ def get_sentences(context):
     sentences = sent_tokenize(context)
     return sentences
 
-def create_expander_with_check_button(title, context, predict_func):
-    claim_key = f"{title.upper()}_claim_entered"
-    evidence_key = f"{title.upper()}_evidence_selected"
-    claim_input_key = f'{title}_input'
-    with st.expander(title):
-        claim = st.text_input(f'Claim {title.upper()}', max_chars=500, key=claim_input_key)
+def create_expander_with_check_button(label, title, context, predict_func):
+    claim_key = f"{label.upper()}_claim_entered"
+    evidence_key = f"{label.upper()}_evidence_selected"
+    claim_input_key = f'{label}_input'
+
+    # Lấy DataFrame từ session state
+    annotated_data = st.session_state['annotated_data']
+    with st.expander(label):
+        claim = st.text_input(f'Claim {label.upper()}', max_chars=500, key=claim_input_key)
         if claim:
-            result = predict_func(context, claim)
-            result_form(result)
-            
-            # Update session state variable when claim is entered
-            st.session_state[claim_key] = True
-            if result and 'evidence' in result:
-                # Get sentences from context
-                sentences = get_sentences(context)
+            if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == title))].empty:
+                st.warning(f"This claim with label '{label}' and title '{default_title}' already exists.")
+            else:
+                result = predict_func(context, claim)
+                result_form(result)
                 
-                # Display sentences for evidence selection
-                st.multiselect("Select evidence:", sentences, key=evidence_key)
+                # Update session state variable when claim is entered
+                st.session_state[claim_key] = True
+                if result and 'evidence' in result:
+                    # Get sentences from context
+                    sentences = get_sentences(context)
+                    
+                    # Display sentences for evidence selection
+                    st.multiselect("Select evidence:", sentences, key=evidence_key)
                 
         else:
             st.warning("Please enter a claim.")
@@ -117,8 +123,7 @@ annotated_data = st.session_state['annotated_data']
 def save_data(context, default_title, default_link):
     # Lấy DataFrame từ session state
     annotated_data = st.session_state['annotated_data']
-    error = ''
-    l =[]
+    
     # Iterate over the claims and save them to the DataFrame
     for label in ['NEI', 'REFUTED', 'SUPPORTED']:
         claim_key = f"{label}_input"
@@ -129,22 +134,11 @@ def save_data(context, default_title, default_link):
             claim = st.session_state[claim_key]
             evidence = st.session_state.get(evidence_key, [])
             
-            # Check if the same claim, label, and title already exist in the DataFrame
-            if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == default_title))].empty:
-                error = 'duplicate'
-                l.append(label)
-            else:
-                error = 'success'
-                # Append data to the DataFrame
-                annotated_data.loc[len(annotated_data)] = ['admin', context, claim, label, evidence, default_title, default_link]
-
+            # Append data to the DataFrame
+            annotated_data.loc[len(annotated_data)] = ['admin', context, claim, label, evidence, default_title, default_link]
+    
     # Lưu DataFrame vào session state
     st.session_state['annotated_data'] = annotated_data
-    
-    return error, l
-             
-    
-    
 
 
 
@@ -221,9 +215,9 @@ def predictor_app():
                         c3_2 = st.container(border=True, height = 650)
                         with c3_2:
                             # Sử dụng hàm để tạo các expander với nút kiểm tra tương ứng
-                            create_expander_with_check_button("NEI", default_context, predict)
-                            create_expander_with_check_button("REFUTED", default_context, predict)
-                            create_expander_with_check_button("SUPPORTED", default_context, predict)
+                            create_expander_with_check_button("NEI", default_title, default_context, predict)
+                            create_expander_with_check_button("REFUTED", default_title, default_context, predict)
+                            create_expander_with_check_button("SUPPORTED", default_title, default_context, predict)
                     
                         # Check if all claims are entered
                         all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
@@ -268,7 +262,9 @@ def predictor_app():
                                 # Check if all claims are entered before saving
                                 if all_claims_entered and all_evidence_selected:
                                     # Save data
-                                    error, duplicate_labels = save_data(default_context, default_title, default_link)  
+                                    save_data(default_context, default_title, default_link)
+                                    error = 'success'
+                                    
                                 else:
                                     error = 'save_fail'
                                     
@@ -283,9 +279,6 @@ def predictor_app():
                             st.warning("Please enter all claims and select all evidence before navigating.")
                         elif error == 'success':
                              st.success("Data saved successfully.")
-                        elif error == 'duplicate':
-                            for label in duplicate_labels:
-                                st.error(f"Claim with label '{label}' already exists for the title '{default_title}'.")
                         else:
                             st.warning("Please enter all claims and select all evidence before saving.")
         with tab2:
