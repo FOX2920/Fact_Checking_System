@@ -84,6 +84,15 @@ def create_expander_with_check_button(title, context, predict_func):
     claim_key = f"{title.upper()}_claim_entered"
     evidence_key = f"{title.upper()}_evidence_selected"
     claim_input_key = f'{title}_input'
+    
+    # Check for duplicate claim and title
+    if st.session_state.get(claim_input_key) and st.session_state.get('annotated_data') is not None:
+        existing_claims = st.session_state['annotated_data']['Claim']
+        existing_titles = st.session_state['annotated_data']['Title']
+        if st.session_state.get(claim_input_key) in existing_claims.values and title in existing_titles.values:
+            st.error("This claim and title is already haved in the annotated data. Please provide unique claim and title.")
+            return
+    
     with st.expander(title):
         claim = st.text_input(f'Claim {title.upper()}', max_chars=500, key=claim_input_key)
         if claim:
@@ -104,6 +113,7 @@ def create_expander_with_check_button(title, context, predict_func):
             
             # Reset session state variables when claim is not entered
             st.session_state[claim_key]= ''
+
 
 
 
