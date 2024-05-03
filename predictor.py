@@ -117,7 +117,8 @@ annotated_data = st.session_state['annotated_data']
 def save_data(context, default_title, default_link):
     # Lấy DataFrame từ session state
     annotated_data = st.session_state['annotated_data']
-    
+    error = ''
+    l =[]
     # Iterate over the claims and save them to the DataFrame
     for label in ['NEI', 'REFUTED', 'SUPPORTED']:
         claim_key = f"{label}_input"
@@ -130,14 +131,20 @@ def save_data(context, default_title, default_link):
             
             # Check if the same claim, label, and title already exist in the DataFrame
             if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == default_title))].empty:
-                st.error(f"Claim '{claim}' with label '{label}' and title '{default_title}' already exists.")
-                return
-            
-            # Append data to the DataFrame
-            annotated_data.loc[len(annotated_data)] = ['admin', context, claim, label, evidence, default_title, default_link]
-    
+                error = 'duplicate'
+                l.append(label)
+            else:
+                error = 'success'
+                # Append data to the DataFrame
+                annotated_data.loc[len(annotated_data)] = ['admin', context, claim, label, evidence, default_title, default_link]
+
     # Lưu DataFrame vào session state
     st.session_state['annotated_data'] = annotated_data
+    
+    return error, l
+             
+    
+    
 
 
 
@@ -261,9 +268,7 @@ def predictor_app():
                                 # Check if all claims are entered before saving
                                 if all_claims_entered and all_evidence_selected:
                                     # Save data
-                                    save_data(default_context, default_title, default_link)
-                                    error = 'success'
-                                    
+                                    error, duplicate_labels = save_data(default_context, default_title, default_link)  
                                 else:
                                     error = 'save_fail'
                                     
@@ -278,6 +283,9 @@ def predictor_app():
                             st.warning("Please enter all claims and select all evidence before navigating.")
                         elif error == 'success':
                              st.success("Data saved successfully.")
+                        elif error == 'duplicate':
+                            for label in duplicate_labels:
+                                st.error(f"Claim with label '{label}' already exists for the title '{default_title}'.")
                         else:
                             st.warning("Please enter all claims and select all evidence before saving.")
         with tab2:
