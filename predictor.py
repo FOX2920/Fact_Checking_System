@@ -138,7 +138,7 @@ def save_data(context, default_title, default_link):
     
     # Lấy DataFrame từ session state
     annotated_data = st.session_state['annotated_data']
-    
+    error = 'success'
     # Iterate over the claims and save them to the DataFrame
     for label in ['NEI', 'REFUTED', 'SUPPORTED']:
         claim_key = f"{label}_input"
@@ -148,12 +148,15 @@ def save_data(context, default_title, default_link):
         if st.session_state.get(claim_key, ''):
             claim = st.session_state[claim_key]
             evidence = st.session_state.get(evidence_key, [])
-            
-            # Append data to the DataFrame
-            annotated_data.loc[len(annotated_data)] = [username, context, claim, label, evidence, default_title, default_link]
+            if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == default_title))].empty:
+                error = 'duplicate'
+            else:
+                # Append data to the DataFrame
+                annotated_data.loc[len(annotated_data)] = [username, context, claim, label, evidence, default_title, default_link]
     
     # Lưu DataFrame vào session state
     st.session_state['annotated_data'] = annotated_data
+    return error
 
 def enough_claims_entered(title):
     # Lấy DataFrame từ session state
@@ -293,9 +296,7 @@ def predictor_app():
                                 # Check if all claims are entered before saving
                                 if all_claims_entered and all_evidence_selected:
                                     # Save data
-                                    save_data(default_context, default_title, default_link)
-                                    error = 'success'
-                                    
+                                    error = save_data(default_context, default_title, default_link)
                                 else:
                                     error = 'save_fail'
                                     
@@ -308,6 +309,8 @@ def predictor_app():
         
                         if error == 'success':
                              st.success("Data saved successfully.")
+                        elif error == 'duplicate':
+                            st.warning(f"Maybe one of these claims with title '{default_title}' already exists.")
                         elif error == 'n_enough':
                              st.warning("Enter at least three claims for each label for this title before navigating.")
                         else:
