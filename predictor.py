@@ -195,11 +195,8 @@ def predictor_app():
         with tab1:
             if uploaded_file is None:
                 st.error("Dataset not found")
-
             else:
-                if 'Summary' not in df.columns or 'ID' not in df.columns or 'Title' not in df.columns or 'URL' not in df.columns:
-                    st.error("Dataset is missing required columns (Summary, ID, Title, URL)")
-                else:
+                try:
                     st.title("Fact Checking annotation app")
                     c1 = st.container(border=True)
                     with c1:
@@ -295,11 +292,16 @@ def predictor_app():
                                  st.warning("Enter at least three claims for each label for this title before navigating.")
                             else:
                                 st.warning("Please enter all claims and select all evidence before saving.")
+                except KeyError:
+                    st.error("Error: Upload Dataset is missing required columns.")          
         with tab2:
             st.title("Saved Annotations")
-            if annotated_data.empty:
-                st.info("No annotations saved yet.")
-            else:
-                st.dataframe(annotated_data)
+            try:
+                if annotated_data.empty:
+                    st.info("No annotations saved yet.")
+                else:
+                    st.dataframe(annotated_data)
+            except KeyError:
+                    st.error("Error: Upload Dataset is missing required columns.")  
 if __name__ == '__main__':
     predictor_app()
