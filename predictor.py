@@ -17,7 +17,7 @@ def creds_entered():
     # Kiểm tra xem tên người dùng và mật khẩu có tồn tại trong dataset không
     if (user_data['user'] == username).any() and (user_data['password'] == password).any():
         st.session_state["authenticated"] = True
-        st.session_state["user"] = username
+        st.session_state["username"] = username  # Lưu tên người dùng vào session state
     else:
         st.session_state["authenticated"] = False
         if not username:
@@ -133,14 +133,17 @@ annotated_data = st.session_state['annotated_data']
 
 
 def save_data(context, default_title, default_link):
+    # Lấy tên người dùng từ session state
+    username = st.session_state.get("username", "admin")
+    
     # Lấy DataFrame từ session state
     annotated_data = st.session_state['annotated_data']
-    username = st.session_state["user"].strip()
+    
     # Iterate over the claims and save them to the DataFrame
     for label in ['NEI', 'REFUTED', 'SUPPORTED']:
         claim_key = f"{label}_input"
         evidence_key = f"{label}_evidence_selected"
-       
+        
         # Check if the claim is entered
         if st.session_state.get(claim_key, ''):
             claim = st.session_state[claim_key]
