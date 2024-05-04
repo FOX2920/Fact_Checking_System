@@ -144,7 +144,7 @@ def save_data(context, default_title, default_link):
         if st.session_state.get(claim_key, ''):
             claim = st.session_state[claim_key]
             evidence = st.session_state.get(evidence_key, [])
-            username = st.session_state(username_key, '') = username
+            username = st.session_state(username_key, '')
             
             # Append data to the DataFrame
             annotated_data.loc[len(annotated_data)] = [username, context, claim, label, evidence, default_title, default_link]
