@@ -6,27 +6,36 @@ from nltk.tokenize import sent_tokenize
 
 st.set_page_config(layout="wide")
 
-def creds_entered() :
-    if st.session_state["user"].strip() == "admin" and st.session_state["passwd"].strip() == "admin":
+def creds_entered():
+    # Đọc dataset người dùng từ file CSV
+    user_data = pd.read_csv("login/user_data.csv")  # Thay đổi đường dẫn tới file CSV của bạn
+    
+    # Lấy tên người dùng và mật khẩu từ session state
+    username = st.session_state["user"].strip()
+    password = st.session_state["passwd"].strip()
+    
+    # Kiểm tra xem tên người dùng và mật khẩu có tồn tại trong dataset không
+    if (user_data['user'] == username).any() and (user_data['password'] == password).any():
         st.session_state["authenticated"] = True
     else:
         st.session_state["authenticated"] = False
-        if not st.session_state["passwd"]:
-            st.warning("Please enter password.")
-        elif not st.session_state["user"]:
+        if not username:
             st.warning("Please enter username.")
+        elif not password:
+            st.warning("Please enter password.")
         else:
             st.error("Invalid Username/Password 🤨")
 
+
 def authenticate_user():
     if "authenticated" not in st.session_state or st.session_state["authenticated"] == False:
-        st.subheader("Login")
-        st.text_input(label="Username :", value="", key="user", on_change=creds_entered)
-        st.text_input(label="Password :", value="", key="passwd", type="password", on_change=creds_entered)
-        login_button = st.button("Login")
-        if login_button:
-            creds_entered()
-        return False
+        with st.form("Login"):
+            st.text_input(label="Username :", value="", key="user", on_change=creds_entered)
+            st.text_input(label="Password :", value="", key="passwd", type="password", on_change=creds_entered)
+            login_button = st.form_submit_button("Submit")
+            if login_button:
+                creds_entered()
+            return False
     else:
         return True
         
@@ -135,7 +144,7 @@ def save_data(context, default_title, default_link):
             evidence = st.session_state.get(evidence_key, [])
             
             # Append data to the DataFrame
-            annotated_data.loc[len(annotated_data)] = ['admin', context, claim, label, evidence, default_title, default_link]
+            annotated_data.loc[len(annotated_data)] = [username, context, claim, label, evidence, default_title, default_link]
     
     # Lưu DataFrame vào session state
     st.session_state['annotated_data'] = annotated_data
