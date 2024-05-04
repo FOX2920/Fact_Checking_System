@@ -149,14 +149,14 @@ def enough_claims_entered(title):
     refuted_claims = annotated_data[(annotated_data['Label'] == 'REFUTED') & (annotated_data['Title'] == title)].shape[0]
     supported_claims = annotated_data[(annotated_data['Label'] == 'SUPPORTED') & (annotated_data['Title'] == title)].shape[0]
 
-    return nei_claims >= 5 and refuted_claims >= 5 and supported_claims >= 5
+    return nei_claims >= 3 and refuted_claims >= 3 and supported_claims >= 3
 
 
   
 
 def predictor_app():
     if authenticate_user():
-        tab1, tab2 = st.tabs(["Annotate", "Save"])
+        tab0, tab1, tab2 = st.tabs(["Mission", "Annotate", "Save"])
         st.sidebar.title("Dataset Upload")
         uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
 
@@ -173,10 +173,8 @@ def predictor_app():
             default_ID = current_row['ID']
             default_title = current_row['Title']
             default_link = current_row['URL']
-
-        with tab1:
-            if uploaded_file is None:
-                c2 = st.container(border=True)
+        with tab0:
+            c2 = st.container(border=True)
                 with c2:
                         st.title("Nhiệm vụ")
                         st.write("""
@@ -189,12 +187,16 @@ def predictor_app():
                                - "REFUTED" (Bị phủ nhận): Khi có bằng chứng hoặc thông tin trong đoạn văn bản phủ nhận hoặc bác bỏ câu khẳng định.
                                - "SUPPORTED" (Được hỗ trợ): Khi có bằng chứng hoặc thông tin trong đoạn văn bản hỗ trợ hoặc chứng minh câu khẳng định.
                             4. **Chọn bằng chứng (nếu cần)**: Nếu câu khẳng định được chọn là "NEI", "REFUTED" hoặc "SUPPORTED", bạn có thể chọn các câu trong đoạn văn bản làm bằng chứng để minh chứng cho quan điểm của mình.
-                            5. **Lưu dữ liệu**: Khi đã phân loại đủ số lượng câu khẳng định theo yêu cầu (ít nhất 5 câu cho mỗi nhãn), bạn có thể lưu các phân loại để sử dụng sau này.
+                            5. **Lưu dữ liệu**: Khi đã phân loại đủ số lượng câu khẳng định theo yêu cầu (ít nhất 3 câu cho mỗi nhãn), bạn có thể lưu các phân loại để sử dụng sau này.
                             6. **Di chuyển đến tiêu đề tiếp theo hoặc tiêu đề trước đó**: Bạn có thể di chuyển qua lại giữa các tiêu đề để thực hiện nhiệm vụ.
                             7. **Đóng ứng dụng**: Khi bạn đã hoàn thành nhiệm vụ, bạn có thể đóng ứng dụng.
                             
                             **Xem chi tiết hướng dẫn cách đặt câu [tại đây](https://docs.google.com/document/d/121GHPAOFa4_fhmXDGJFYCrmsStcXYc7H/edit?usp=sharing&ouid=110042004969109109331&rtpof=true&sd=true).**
                     """)
+
+        with tab1:
+            if uploaded_file is None:
+                st.error("Dataset not found")
 
             else:
                 st.title("Fact Checking annotation app")
@@ -202,13 +204,13 @@ def predictor_app():
                 with c1:
                     ten_file, id_cau, chu_de, link = st.columns(4)
                     with ten_file:
-                        st.text_input("Tên File:",value=uploaded_file.name)
+                        st.text_input("Tên File:",value=uploaded_file.name, disabled=True)
                     with id_cau:
-                        st.text_input("ID Context: ",value=default_ID)
+                        st.text_input("ID Context: ",value=default_ID, disabled=True)
                     with chu_de:
-                        st.text_input("Chủ đề:", value=default_title)
+                        st.text_input("Chủ đề:", value=default_title, disabled=True)
                     with link:
-                        st.text_input("Link:",value=default_link)
+                        st.text_input("Link:",value=default_link, disabled=True)
                     
                 c3 = st.container(border=True)
                 with c3:
@@ -289,7 +291,7 @@ def predictor_app():
                         if error == 'success':
                              st.success("Data saved successfully.")
                         elif error == 'n_enough':
-                             st.warning("Enter at least five claims for each label for this title before navigating.")
+                             st.warning("Enter at least three claims for each label for this title before navigating.")
                         else:
                             st.warning("Please enter all claims and select all evidence before saving.")
         with tab2:
