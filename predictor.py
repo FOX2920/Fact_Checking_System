@@ -178,24 +178,24 @@ def predictor_app():
             if uploaded_file is None:
                 c2 = st.container(border=True)
                 with c2:
-                    nv, ev = st.columns(2)
-                    with nv:
                         st.title("Nhiệm vụ")
                         st.write("""
-                            ## Mô tả nhiệm vụ:
-                            Nhiệm vụ của bạn là phân loại các câu khẳng định cho trước vào một trong ba nhóm sau: "NEI" (Không đủ thông tin), "REFUTED" (Bị phủ nhận), hoặc "SUPPORTED" (Được hỗ trợ), dựa trên đoạn văn bản được cung cấp. Dưới đây là các bước để thực hiện nhiệm vụ này:
-                        
+                            Nhiệm vụ của bạn là phân loại các câu khẳng định cho trước vào một trong ba nhóm sau: "NEI" (Không đủ thông tin), "REFUTED" (Bị phủ nhận), hoặc "SUPPORTED" (Được hỗ trợ), dựa trên đoạn văn bản được cung cấp. Bạn sẽ chỉ có thể di chuyển qua lại giữa các tiêu đề để thực hiện nhiệm vụ. Dưới đây là các bước để thực hiện nhiệm vụ này:
+
                             1. **Đọc đoạn văn bản**: Hiểu nội dung của đoạn văn bản được cung cấp.
-                            2. **Nhập một câu khẳng định**: Đưa ra một câu khẳng định dựa trên nội dung của đoạn văn bản.
+                            2. **Nhập một câu khẳng định**: Đưa ra một câu khẳng định dựa trên nội dung của đoạn văn bản. Hãy chắc chắn rằng câu khẳng định là một phát biểu rõ ràng và có thể được kiểm tra tính đúng đắn.
                             3. **Phân loại câu khẳng định**: Chọn một trong ba nhãn sau để phân loại câu khẳng định:
                                - "NEI" (Không đủ thông tin): Khi không có đủ thông tin trong đoạn văn bản để xác định tính đúng đắn của câu khẳng định.
                                - "REFUTED" (Bị phủ nhận): Khi có bằng chứng hoặc thông tin trong đoạn văn bản phủ nhận hoặc bác bỏ câu khẳng định.
                                - "SUPPORTED" (Được hỗ trợ): Khi có bằng chứng hoặc thông tin trong đoạn văn bản hỗ trợ hoặc chứng minh câu khẳng định.
                             4. **Chọn bằng chứng (nếu cần)**: Nếu câu khẳng định được chọn là "NEI", "REFUTED" hoặc "SUPPORTED", bạn có thể chọn các câu trong đoạn văn bản làm bằng chứng để minh chứng cho quan điểm của mình.
                             5. **Lưu dữ liệu**: Khi đã phân loại đủ số lượng câu khẳng định theo yêu cầu (ít nhất 5 câu cho mỗi nhãn), bạn có thể lưu các phân loại để sử dụng sau này.
-                            6. **Di chuyển đến câu tiếp theo hoặc câu trước đó**: Bạn có thể di chuyển qua lại giữa các câu khẳng định trong đoạn văn bản để thực hiện phân loại và lưu dữ liệu.
+                            6. **Di chuyển đến tiêu đề tiếp theo hoặc tiêu đề trước đó**: Bạn có thể di chuyển qua lại giữa các tiêu đề để thực hiện nhiệm vụ.
                             7. **Đóng ứng dụng**: Khi bạn đã hoàn thành nhiệm vụ, bạn có thể đóng ứng dụng.
-                            """)
+                            
+                            **Xem chi tiết hướng dẫn cách đặt câu [tại đây](https://docs.google.com/document/d/121GHPAOFa4_fhmXDGJFYCrmsStcXYc7H/edit?usp=sharing&ouid=110042004969109109331&rtpof=true&sd=true).**
+                    """)
+
             else:
                 st.title("Fact Checking annotation app")
                 c1 = st.container(border=True)
