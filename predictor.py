@@ -17,6 +17,7 @@ def creds_entered():
     # Kiểm tra xem tên người dùng và mật khẩu có tồn tại trong dataset không
     if (user_data['user'] == username).any() and (user_data['password'] == password).any():
         st.session_state["authenticated"] = True
+        st.session_state["user"] = username
     else:
         st.session_state["authenticated"] = False
         if not username:
