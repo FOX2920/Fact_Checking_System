@@ -30,14 +30,15 @@ def creds_entered():
 def authenticate_user():
     if "authenticated" not in st.session_state or st.session_state["authenticated"] == False:
         with st.form("Login"):
-            st.text_input(label="Username :", value="", key="user", on_change=creds_entered)
-            st.text_input(label="Password :", value="", key="passwd", type="password", on_change=creds_entered)
-            login_button = st.form_submit_button("Submit")
+            st.text_input(label="Username :", value="", key="user")
+            st.text_input(label="Password :", value="", key="passwd", type="password")
+            login_button = st.form_submit_button("Submit", on_click=creds_entered)
             if login_button:
                 creds_entered()
             return False
     else:
         return True
+
         
 
 # def predict(context, claim):
