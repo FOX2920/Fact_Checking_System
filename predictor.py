@@ -188,6 +188,7 @@ def predictor_app():
             # Kiểm tra xem tất cả các cột cần thiết có tồn tại không
             if not set(required_columns).issubset(df.columns):
                 st.error("Error: Upload Dataset is missing required columns.")
+                st.stop()
             else:
                 max_index = len(df) - 1
                 current_index = st.session_state.get("current_index", 0)
