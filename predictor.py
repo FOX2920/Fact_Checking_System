@@ -107,23 +107,21 @@ def create_expander_with_check_button(label, title, context, predict_func):
             else:
                 result = predict_func(context, claim)
                 result_form(result)
+                
                 # Update session state variable when claim is entered
                 st.session_state[claim_key] = True
                 if result and 'evidence' in result:
-                    if label.upper() in ['SUPPORTED', 'REFUTED'] and result['probabilities'].get(label, 0) > 0.45:
-                        st.warning("Claim predicted with over 45%, please rewrite the claim instead of selecting evidence.")
-                    else:
-                        # Get sentences from context
-                        sentences = get_sentences(context)
-                        
-                        # Display sentences for evidence selection
-                        st.multiselect("Select evidence:", sentences, key=evidence_key, max_selections=5)
+                    # Get sentences from context
+                    sentences = get_sentences(context)
+                    
+                    # Display sentences for evidence selection
+                    st.multiselect("Select evidence:", sentences, key=evidence_key, max_selections=5)
+                
         else:
             st.warning("Please enter a claim.")
             
             # Reset session state variables when claim is not entered
             st.session_state[claim_key]= ''
-
 
 
 
@@ -254,12 +252,12 @@ def predictor_app():
                             create_expander_with_check_button("SUPPORTED", default_title, default_context, predict)
                     
                         # Check if all claims are entered
-                        all_claims_entered = st.session_state.get("NEI_claim_entered", False) or \
-                                              st.session_state.get("REFUTED_claim_entered", False) or \
+                        all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
+                                              st.session_state.get("REFUTED_claim_entered", False) and \
                                               st.session_state.get("SUPPORTED_claim_entered", False)
                         
-                        all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) or \
-                                 st.session_state.get("REFUTED_evidence_selected", []) or \
+                        all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and  \
+                                 st.session_state.get("REFUTED_evidence_selected", []) and \
                                  st.session_state.get("SUPPORTED_evidence_selected", []))
                         
                         previous, next_, save, close = st.columns(4)
@@ -316,7 +314,7 @@ def predictor_app():
                         elif error == 'n_enough':
                              st.warning("Enter at least three claims for each label for this title before navigating.")
                         else:
-                            st.warning("Please enter at least one claim and select evidence before saving.")
+                            st.warning("Please enter all claims and select all evidence before saving.")
         with tab2:
             st.title("Saved Annotations")
             if annotated_data.empty:
