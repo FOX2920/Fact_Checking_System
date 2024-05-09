@@ -106,18 +106,18 @@ def create_expander_with_check_button(label, title, context, predict_func):
                 st.warning(f"This claim with label '{label}' and title '{title}' already exists.")
             else:
                 result = predict_func(context, claim)
-                    result_form(result)
-                    # Update session state variable when claim is entered
-                    st.session_state[claim_key] = True
-                    if result and 'evidence' in result:
-                        if label.upper() in ['SUPPORTED', 'REFUTED'] and result['probabilities'].get(label, 0) > 0.45:
-                            st.warning("Claim predicted with over 45%, please rewrite the claim instead of selecting evidence.")
-                        else:
-                            # Get sentences from context
-                            sentences = get_sentences(context)
-                            
-                            # Display sentences for evidence selection
-                            st.multiselect("Select evidence:", sentences, key=evidence_key, max_selections=5)
+                result_form(result)
+                # Update session state variable when claim is entered
+                st.session_state[claim_key] = True
+                if result and 'evidence' in result:
+                    if label.upper() in ['SUPPORTED', 'REFUTED'] and result['probabilities'].get(label, 0) > 0.45:
+                        st.warning("Claim predicted with over 45%, please rewrite the claim instead of selecting evidence.")
+                    else:
+                        # Get sentences from context
+                        sentences = get_sentences(context)
+                        
+                        # Display sentences for evidence selection
+                        st.multiselect("Select evidence:", sentences, key=evidence_key, max_selections=5)
         else:
             st.warning("Please enter a claim.")
             
