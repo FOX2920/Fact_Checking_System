@@ -6,41 +6,6 @@ from nltk.tokenize import sent_tokenize
 
 st.set_page_config(layout="wide")
 
-def creds_entered():
-    # Đọc dataset người dùng từ file CSV
-    user_data = pd.read_csv("login/user_data.csv")  # Thay đổi đường dẫn tới file CSV của bạn
-    
-    # Lấy tên người dùng và mật khẩu từ session state
-    username = st.session_state["user"].strip()
-    password = st.session_state["passwd"].strip()
-    
-    # Kiểm tra xem tên người dùng và mật khẩu có tồn tại trong dataset không
-    if (user_data['user'] == username).any() and (user_data['password'] == password).any():
-        st.session_state["authenticated"] = True
-        st.session_state["username"] = username  # Lưu tên người dùng vào session state
-    else:
-        st.session_state["authenticated"] = False
-        if not username:
-            st.warning("Please enter username.")
-        elif not password:
-            st.warning("Please enter password.")
-        else:
-            st.error("Invalid Username/Password 🤨")
-
-
-def authenticate_user():
-    if "authenticated" not in st.session_state or st.session_state["authenticated"] == False:
-        with st.form("Login"):
-            st.subheader("Login")
-            st.text_input(label="Username :", value="", key="user")
-            st.text_input(label="Password :", value="", key="passwd", type="password")
-            login_button = st.form_submit_button("Submit", on_click=creds_entered)
-            if login_button:
-                creds_entered()
-            return False
-    else:
-        return True
-
         
 
 # def predict(context, claim):
@@ -173,153 +138,152 @@ def enough_claims_entered(title):
   
 
 def predictor_app():
-    if authenticate_user():
-        tab0, tab1, tab2 = st.tabs(["Mission", "Annotate", "Save"])
-        st.sidebar.title("Dataset Upload")
-        uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
-        with tab0:
-            c2 = st.container(border=True)
-            with c2:
-                    st.title("Nhiệm vụ")
-                    st.write("""
-                        Nhiệm vụ của bạn là phân loại các câu khẳng định cho trước vào một trong ba nhóm sau: "NEI" (Không đủ thông tin), "REFUTED" (Bị phủ nhận), hoặc "SUPPORTED" (Được hỗ trợ), dựa trên đoạn văn bản được cung cấp. Bạn sẽ chỉ có thể di chuyển qua lại giữa các tiêu đề để thực hiện nhiệm vụ. Dưới đây là các bước để thực hiện nhiệm vụ này:
+    tab0, tab1, tab2 = st.tabs(["Mission", "Annotate", "Save"])
+    st.sidebar.title("Dataset Upload")
+    uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
+    with tab0:
+        c2 = st.container(border=True)
+        with c2:
+                st.title("Nhiệm vụ")
+                st.write("""
+                    Nhiệm vụ của bạn là phân loại các câu khẳng định cho trước vào một trong ba nhóm sau: "NEI" (Không đủ thông tin), "REFUTED" (Bị phủ nhận), hoặc "SUPPORTED" (Được hỗ trợ), dựa trên đoạn văn bản được cung cấp. Bạn sẽ chỉ có thể di chuyển qua lại giữa các tiêu đề để thực hiện nhiệm vụ. Dưới đây là các bước để thực hiện nhiệm vụ này:
 
-                        1. **Đọc đoạn văn bản**: Hiểu nội dung của đoạn văn bản được cung cấp.
-                        2. **Nhập một câu khẳng định**: Đưa ra một câu khẳng định dựa trên nội dung của đoạn văn bản. Hãy chắc chắn rằng câu khẳng định là một phát biểu rõ ràng và có thể được kiểm tra tính đúng đắn.
-                        3. **Phân loại câu khẳng định**: Chọn một trong ba nhãn sau để phân loại câu khẳng định:
-                           - "NEI" (Không đủ thông tin): Khi không có đủ thông tin trong đoạn văn bản để xác định tính đúng đắn của câu khẳng định.
-                           - "REFUTED" (Bị phủ nhận): Khi có bằng chứng hoặc thông tin trong đoạn văn bản phủ nhận hoặc bác bỏ câu khẳng định.
-                           - "SUPPORTED" (Được hỗ trợ): Khi có bằng chứng hoặc thông tin trong đoạn văn bản hỗ trợ hoặc chứng minh câu khẳng định.
-                        4. **Chọn bằng chứng (nếu cần)**: Nếu câu khẳng định được chọn là "NEI", "REFUTED" hoặc "SUPPORTED", bạn có thể chọn các câu trong đoạn văn bản làm bằng chứng để minh chứng cho quan điểm của mình.
-                        5. **Lưu dữ liệu**: Khi đã phân loại đủ số lượng câu khẳng định theo yêu cầu (ít nhất 3 câu cho mỗi nhãn), bạn có thể lưu các phân loại để sử dụng sau này.
-                        6. **Di chuyển đến tiêu đề tiếp theo hoặc tiêu đề trước đó**: Bạn có thể di chuyển qua lại giữa các tiêu đề để thực hiện nhiệm vụ.
-                        7. **Đóng ứng dụng**: Khi bạn đã hoàn thành nhiệm vụ, bạn có thể đóng ứng dụng.
-                        
-                        **Xem chi tiết hướng dẫn cách đặt câu [tại đây](https://docs.google.com/document/d/121GHPAOFa4_fhmXDGJFYCrmsStcXYc7H/edit?usp=sharing&ouid=110042004969109109331&rtpof=true&sd=true).**
-                """)
-        if uploaded_file is None:
-            st.sidebar.warning("Please upload a CSV file.")
+                    1. **Đọc đoạn văn bản**: Hiểu nội dung của đoạn văn bản được cung cấp.
+                    2. **Nhập một câu khẳng định**: Đưa ra một câu khẳng định dựa trên nội dung của đoạn văn bản. Hãy chắc chắn rằng câu khẳng định là một phát biểu rõ ràng và có thể được kiểm tra tính đúng đắn.
+                    3. **Phân loại câu khẳng định**: Chọn một trong ba nhãn sau để phân loại câu khẳng định:
+                       - "NEI" (Không đủ thông tin): Khi không có đủ thông tin trong đoạn văn bản để xác định tính đúng đắn của câu khẳng định.
+                       - "REFUTED" (Bị phủ nhận): Khi có bằng chứng hoặc thông tin trong đoạn văn bản phủ nhận hoặc bác bỏ câu khẳng định.
+                       - "SUPPORTED" (Được hỗ trợ): Khi có bằng chứng hoặc thông tin trong đoạn văn bản hỗ trợ hoặc chứng minh câu khẳng định.
+                    4. **Chọn bằng chứng (nếu cần)**: Nếu câu khẳng định được chọn là "NEI", "REFUTED" hoặc "SUPPORTED", bạn có thể chọn các câu trong đoạn văn bản làm bằng chứng để minh chứng cho quan điểm của mình.
+                    5. **Lưu dữ liệu**: Khi đã phân loại đủ số lượng câu khẳng định theo yêu cầu (ít nhất 3 câu cho mỗi nhãn), bạn có thể lưu các phân loại để sử dụng sau này.
+                    6. **Di chuyển đến tiêu đề tiếp theo hoặc tiêu đề trước đó**: Bạn có thể di chuyển qua lại giữa các tiêu đề để thực hiện nhiệm vụ.
+                    7. **Đóng ứng dụng**: Khi bạn đã hoàn thành nhiệm vụ, bạn có thể đóng ứng dụng.
+                    
+                    **Xem chi tiết hướng dẫn cách đặt câu [tại đây](https://docs.google.com/document/d/121GHPAOFa4_fhmXDGJFYCrmsStcXYc7H/edit?usp=sharing&ouid=110042004969109109331&rtpof=true&sd=true).**
+            """)
+    if uploaded_file is None:
+        st.sidebar.warning("Please upload a CSV file.")
+    else:
+        df = pd.read_csv(uploaded_file)
+        required_columns = ['Summary', 'ID', 'Title', 'URL']  # Các cột cần thiết
+        
+        # Kiểm tra xem tất cả các cột cần thiết có tồn tại không
+        if not set(required_columns).issubset(df.columns):
+            st.error("Error: Upload Dataset is missing required columns.")
+            st.stop()
         else:
-            df = pd.read_csv(uploaded_file)
-            required_columns = ['Summary', 'ID', 'Title', 'URL']  # Các cột cần thiết
+            max_index = len(df) - 1
+            current_index = st.session_state.get("current_index", 0)
+            current_row = df.iloc[current_index]
             
-            # Kiểm tra xem tất cả các cột cần thiết có tồn tại không
-            if not set(required_columns).issubset(df.columns):
-                st.error("Error: Upload Dataset is missing required columns.")
-                st.stop()
-            else:
-                max_index = len(df) - 1
-                current_index = st.session_state.get("current_index", 0)
-                current_row = df.iloc[current_index]
+            default_context = current_row['Summary']
+            default_ID = current_row['ID']
+            default_title = current_row['Title']
+            default_link = current_row['URL']
+    with tab1:
+        if uploaded_file is None:
+            st.error("Dataset not found")
+        else:
+            st.title("Fact Checking annotation app")
+            c1 = st.container(border=True)
+            with c1:
+                ten_file, id_cau, chu_de, link = st.columns(4)
+                with ten_file:
+                    st.text_input("Tên File:",value=uploaded_file.name, disabled=True)
+                with id_cau:
+                    st.text_input("ID Context: ",value=default_ID, disabled=True)
+                with chu_de:
+                    st.text_input("Chủ đề:", value=default_title, disabled=True)
+                with link:
+                    st.text_input("Link:",value=default_link, disabled=True)
                 
-                default_context = current_row['Summary']
-                default_ID = current_row['ID']
-                default_title = current_row['Title']
-                default_link = current_row['URL']
-        with tab1:
-            if uploaded_file is None:
-                st.error("Dataset not found")
-            else:
-                st.title("Fact Checking annotation app")
-                c1 = st.container(border=True)
-                with c1:
-                    ten_file, id_cau, chu_de, link = st.columns(4)
-                    with ten_file:
-                        st.text_input("Tên File:",value=uploaded_file.name, disabled=True)
-                    with id_cau:
-                        st.text_input("ID Context: ",value=default_ID, disabled=True)
-                    with chu_de:
-                        st.text_input("Chủ đề:", value=default_title, disabled=True)
-                    with link:
-                        st.text_input("Link:",value=default_link, disabled=True)
+            c3 = st.container(border=True)
+            with c3:
+                left_column, right_column = st.columns([0.45, 0.55])
+                with left_column:
+                    st.title("Context")
+                    c3_1 = st.container(border=True, height = 770)
+                    with c3_1:
+                        st.write(f'{default_context}')
+        
+                with right_column:
+                    st.title("Claim")
+                    c3_2 = st.container(border=True, height = 650)
+                    with c3_2:
+                        # Sử dụng hàm để tạo các expander với nút kiểm tra tương ứng
+                        create_expander_with_check_button("NEI", default_title, default_context, predict)
+                        create_expander_with_check_button("REFUTED", default_title, default_context, predict)
+                        create_expander_with_check_button("SUPPORTED", default_title, default_context, predict)
+                
+                    # Check if all claims are entered
+                    all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
+                                          st.session_state.get("REFUTED_claim_entered", False) and \
+                                          st.session_state.get("SUPPORTED_claim_entered", False)
                     
-                c3 = st.container(border=True)
-                with c3:
-                    left_column, right_column = st.columns([0.45, 0.55])
-                    with left_column:
-                        st.title("Context")
-                        c3_1 = st.container(border=True, height = 770)
-                        with c3_1:
-                            st.write(f'{default_context}')
-            
-                    with right_column:
-                        st.title("Claim")
-                        c3_2 = st.container(border=True, height = 650)
-                        with c3_2:
-                            # Sử dụng hàm để tạo các expander với nút kiểm tra tương ứng
-                            create_expander_with_check_button("NEI", default_title, default_context, predict)
-                            create_expander_with_check_button("REFUTED", default_title, default_context, predict)
-                            create_expander_with_check_button("SUPPORTED", default_title, default_context, predict)
+                    all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and  \
+                             st.session_state.get("REFUTED_evidence_selected", []) and \
+                             st.session_state.get("SUPPORTED_evidence_selected", []))
                     
-                        # Check if all claims are entered
-                        all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
-                                              st.session_state.get("REFUTED_claim_entered", False) and \
-                                              st.session_state.get("SUPPORTED_claim_entered", False)
-                        
-                        all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and  \
-                                 st.session_state.get("REFUTED_evidence_selected", []) and \
-                                 st.session_state.get("SUPPORTED_evidence_selected", []))
-                        
-                        previous, next_, save, close = st.columns(4)
-                        error = ''
-                        with previous:
-                            pr = st.button("Previous")
-                            if pr:
-                                if enough_claims_entered(default_title):
-                                    if current_index > 0:
-                                        st.session_state["current_index"] = current_index - 1
-                                        st.experimental_rerun()
-                                    else:
-                                        st.session_state["current_index"] = max_index
-                                        st.experimental_rerun()
+                    previous, next_, save, close = st.columns(4)
+                    error = ''
+                    with previous:
+                        pr = st.button("Previous")
+                        if pr:
+                            if enough_claims_entered(default_title):
+                                if current_index > 0:
+                                    st.session_state["current_index"] = current_index - 1
+                                    st.experimental_rerun()
                                 else:
-                                    error = 'n_enough'
-                        
-                        with next_:
-                            next_b = st.button("Next")
-                            if next_b:
-                                if enough_claims_entered(default_title):
-                                    if current_index < max_index:
-                                        st.session_state["current_index"] = current_index + 1
-                                        st.experimental_rerun()
-                                    else:
-                                        st.session_state["current_index"] = 0
-                                        st.experimental_rerun()
+                                    st.session_state["current_index"] = max_index
+                                    st.experimental_rerun()
+                            else:
+                                error = 'n_enough'
+                    
+                    with next_:
+                        next_b = st.button("Next")
+                        if next_b:
+                            if enough_claims_entered(default_title):
+                                if current_index < max_index:
+                                    st.session_state["current_index"] = current_index + 1
+                                    st.experimental_rerun()
                                 else:
-                                    error = 'n_enough'
+                                    st.session_state["current_index"] = 0
+                                    st.experimental_rerun()
+                            else:
+                                error = 'n_enough'
+                            
+    
+    
+                    with save:
+                        save_button = st.button("Save")
+                        if save_button:
+                            # Check if all claims are entered before saving
+                            if all_claims_entered and all_evidence_selected:
+                                # Save data
+                                error = save_data(default_context, default_title, default_link)
+                            else:
+                                error = 'save_fail'
                                 
-        
-        
-                        with save:
-                            save_button = st.button("Save")
-                            if save_button:
-                                # Check if all claims are entered before saving
-                                if all_claims_entered and all_evidence_selected:
-                                    # Save data
-                                    error = save_data(default_context, default_title, default_link)
-                                else:
-                                    error = 'save_fail'
-                                    
-        
-                        with close:
-                            cl = st.button("Close")
-                            if cl:
-                                st.session_state["authenticated"] = False
-                                st.experimental_rerun()
-        
-                        if error == 'success':
-                             st.success("Data saved successfully.")
-                        elif error == 'duplicate':
-                            st.warning(f"Maybe one of these claims with title '{default_title}' already exists.")
-                        elif error == 'n_enough':
-                             st.warning("Enter at least three claims for each label for this title before navigating.")
-                        else:
-                            st.warning("Please enter all claims and select all evidence before saving.")
-        with tab2:
-            st.title("Saved Annotations")
-            if annotated_data.empty:
-                st.info("No annotations saved yet.")
-            else:
-                st.dataframe(annotated_data)
+    
+                    with close:
+                        cl = st.button("Close")
+                        if cl:
+                            st.session_state["authenticated"] = False
+                            st.experimental_rerun()
+    
+                    if error == 'success':
+                         st.success("Data saved successfully.")
+                    elif error == 'duplicate':
+                        st.warning(f"Maybe one of these claims with title '{default_title}' already exists.")
+                    elif error == 'n_enough':
+                         st.warning("Enter at least three claims for each label for this title before navigating.")
+                    else:
+                        st.warning("Please enter all claims and select all evidence before saving.")
+    with tab2:
+        st.title("Saved Annotations")
+        if annotated_data.empty:
+            st.info("No annotations saved yet.")
+        else:
+            st.dataframe(annotated_data)
 if __name__ == '__main__':
     predictor_app()
