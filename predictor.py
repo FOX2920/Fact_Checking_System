@@ -221,9 +221,9 @@ def predictor_app():
                     c3_2 = st.container(border=True, height = 650)
                     with c3_2:
                         # Sử dụng hàm để tạo các expander với nút kiểm tra tương ứng
-                        create_expander_with_check_button("NEI", default_title, default_context, predict)
-                        create_expander_with_check_button("REFUTED", default_title, default_context, predict)
                         create_expander_with_check_button("SUPPORTED", default_title, default_context, predict)
+                        create_expander_with_check_button("REFUTED", default_title, default_context, predict)
+                        create_expander_with_check_button("NEI", default_title, default_context, predict)
                 
                     # Check if all claims are entered
                     all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
