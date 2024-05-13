@@ -146,21 +146,21 @@ def predictor_app():
         with c2:
                 st.title("Nhiệm vụ")
                 st.write("""
-                    Nhiệm vụ của bạn là tạo các câu nhận định cho các nhãn sau: "SUPPORTED" (Được hỗ trợ), "REFUTED" (Bị phủ nhận) hoặc "NEI" (Không đủ thông tin) dựa trên đoạn văn bản được cung cấp trước đó. Dưới đây là các bước để thực hiện nhiệm vụ này:
-                        1.	**Đọc đoạn văn bản (context)**: hiểu nội dung, thông tin của đoạn văn bản được cung cấp.
-                        2.	**Nhập câu nhận định**: dựa trên thông tin, nội dung đó, bạn hãy viết câu nhận định cho đoạn văn đó. 
-                        3.	**Phân loại câu nhận định**: sau khi đã viết xong câu nhận định, bạn hãy sắp xếp nó vào một trong ba nhãn sau:
-                        -	“SUPPORTED” (được hỗ trợ): đây là nhãn mà khi câu nhận định của bạn là chính xác theo những thông tin nội dung của đoạn văn bản (context) cung cấp
-                        -	“REFUTED” (bị bác bỏ): ngược lại với “SUPPORTED”, đây là nhãn mà khi câu nhận định của bạn là sai so với những thông tin nội dung của đoạn văn bản (context) đưa ra
-                        -	“NEI” (không đủ thông tin): khi thông tin mà câu nhận định của bạn đưa ra chưa thể xác định được đúng hoặc sai dựa trên thông tin của đoạn văn bản (context) cung cấp; hoặc ít nhất một thông tin mà bạn đưa ra trong câu nhận định không xuất hiện ở đoạn văn bản (context)
+                        Nhiệm vụ của bạn là tạo các câu nhận định cho các nhãn sau: "SUPPORTED" (Được hỗ trợ), "REFUTED" (Bị phủ nhận) hoặc "NEI" (Không đủ thông tin) dựa trên đoạn văn bản được cung cấp trước đó. Dưới đây là các bước để thực hiện nhiệm vụ này:
+                        1.**Đọc đoạn văn bản (context)**: hiểu nội dung, thông tin của đoạn văn bản được cung cấp.
+                        2.**Nhập câu nhận định**: dựa trên thông tin, nội dung đó, bạn hãy viết câu nhận định cho đoạn văn đó. 
+                        3.**Phân loại câu nhận định**: sau khi đã viết xong câu nhận định, bạn hãy sắp xếp nó vào một trong ba nhãn sau:
+                        -“SUPPORTED” (được hỗ trợ): đây là nhãn mà khi câu nhận định của bạn là chính xác theo những thông tin nội dung của đoạn văn bản (context) cung cấp
+                        -“REFUTED” (bị bác bỏ): ngược lại với “SUPPORTED”, đây là nhãn mà khi câu nhận định của bạn là sai so với những thông tin nội dung của đoạn văn bản (context) đưa ra
+                        -“NEI” (không đủ thông tin): khi thông tin mà câu nhận định của bạn đưa ra chưa thể xác định được đúng hoặc sai dựa trên thông tin của đoạn văn bản (context) cung cấp; hoặc ít nhất một thông tin mà bạn đưa ra trong câu nhận định không xuất hiện ở đoạn văn bản (context)
                         ** Lưu ý rằng các bạn sẽ không sử dụng các kiến thức, thông tin ở bên ngoài mà chỉ dựa vào nội dung đoạn văn bản (context) cung cấp để đưa ra câu nhận định và sắp xếp nó vào nhãn thích hợp
-                        4.	**Chọn bằng chứng (Evidence)**: đối với hai nhãn “SUPPORTED” & “REFUTED”, các bạn sẽ chọn bằng chứng (evidence) cho câu nhận định. Nghĩa là các bạn sẽ chọn những thông tin trong đoạn văn bản (context) để dựa theo đó để chứng minh rằng câu nhận định của bạn là đúng (đối với “SUPPORTED”) hoặc sai (đối với “REFUTED”). Các bạn chỉ chọn những thông tin cần thiết (không chọn hết cả câu hoặc cả đoạn văn)
-                        5.	**Lưu dữ liệu**: Sau khi đã nhập đủ 2 câu (mỗi nhãn một câu), bạn nhấn vào nút “Save” bên dưới để lưu lại các câu đó. Sau khi lưu hoàn tất, thông báo sẽ hiện và các câu đã viết trước đó sẽ được clear để viết câu mới.
-                        6.	**Di chuyển đến đoạn văn bản (context) khác**: bạn có thể di chuyển qua lại giữa các context với nhau nhưng chỉ khi bạn đã tạo tối thiểu 6 câu nhận định (mỗi nhãn tối thiểu 2 câu)
-                        7.	**Đóng ứng dụng**: khi muốn kết thúc phiên làm việc, bạn ấn nút “close” để đóng ứng dụng ---- nhớ save lại (bước 5) trước khi thoát nhé <3
+                        4.**Chọn bằng chứng (Evidence)**: đối với hai nhãn “SUPPORTED” & “REFUTED”, các bạn sẽ chọn bằng chứng (evidence) cho câu nhận định. Nghĩa là các bạn sẽ chọn những thông tin trong đoạn văn bản (context) để dựa theo đó để chứng minh rằng câu nhận định của bạn là đúng (đối với “SUPPORTED”) hoặc sai (đối với “REFUTED”). Các bạn chỉ chọn những thông tin cần thiết (không chọn hết cả câu hoặc cả đoạn văn)
+                        5.**Lưu dữ liệu**: Sau khi đã nhập đủ 2 câu (mỗi nhãn một câu), bạn nhấn vào nút “Save” bên dưới để lưu lại các câu đó. Sau khi lưu hoàn tất, thông báo sẽ hiện và các câu đã viết trước đó sẽ được clear để viết câu mới.
+                        6.**Di chuyển đến đoạn văn bản (context) khác**: bạn có thể di chuyển qua lại giữa các context với nhau nhưng chỉ khi bạn đã tạo tối thiểu 6 câu nhận định (mỗi nhãn tối thiểu 2 câu)
+                        7.**Đóng ứng dụng**: khi muốn kết thúc phiên làm việc, bạn ấn nút “close” để đóng ứng dụng ---- nhớ save lại (bước 5) trước khi thoát nhé <3
                         
-                        Xem chi tiết hướng dẫn cách đặt câu nhận định: (tại đây)[https://docs.google.com/document/d/121GHPAOFa4_fhmXDGJFYCrmsStcXYc7H/edit].
-                        Lấy các đoạn văn bản (context): (tại đây)[https://drive.google.com/drive/folders/1bbW7qiglBZHvGs5oNF-s_eac09t5oWOW].
+                        Xem chi tiết hướng dẫn cách đặt câu nhận định: [tại đây](https://docs.google.com/document/d/121GHPAOFa4_fhmXDGJFYCrmsStcXYc7H/edit).
+                        Lấy các đoạn văn bản (context): [tại đây](https://drive.google.com/drive/folders/1bbW7qiglBZHvGs5oNF-s_eac09t5oWOW).
             """)
     if uploaded_file is None:
         st.sidebar.warning("Please upload a CSV file.")
