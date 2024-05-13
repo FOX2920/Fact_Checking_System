@@ -168,7 +168,7 @@ def predictor_app():
                 Xem chi tiết hướng dẫn cách đặt câu nhận định [tại đây](https://docs.google.com/document/d/121GHPAOFa4_fhmXDGJFYCrmsStcXYc7H/edit).
                 
                 Lấy các đoạn văn bản (context): [tại đây](https://drive.google.com/drive/folders/1bbW7qiglBZHvGs5oNF-s_eac09t5oWOW).
-                """)  
+                """, unsafe_allow_html=True)  
 
 
     if uploaded_file is None:
