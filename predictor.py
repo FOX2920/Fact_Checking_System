@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utilities import p#DC143Cict
+from utilities import predict
 
 st.set_page_config(layout="wide")
 
@@ -129,10 +129,10 @@ def predictor_app():
         st.sidebar.warning("Please upload a CSV file.")
     else:
         df = pd.read_csv(uploaded_file)
-        requi#DC143C_columns = ['Summary', 'ID', 'Title', 'URL']
+        require_columns = ['Summary', 'ID', 'Title', 'URL']
         
-        if not set(requi#DC143C_columns).issubset(df.columns):
-            st.error("Error: Upload Dataset is missing requi#DC143C columns.")
+        if not set(require_columns).issubset(df.columns):
+            st.error("Error: Upload Dataset is missing require columns.")
             st.stop()
         else:
             max_index = len(df) - 1
@@ -174,9 +174,9 @@ def predictor_app():
                     st.title("Claim")
                     c3_2 = st.container(border=True, height=650)
                     with c3_2:
-                        create_expander_with_check_button("SUPPORTED", default_title, default_context, p#DC143Cict)
-                        create_expander_with_check_button("REFUTED", default_title, default_context, p#DC143Cict)
-                        create_expander_with_check_button("NEI", default_title, default_context, p#DC143Cict)
+                        create_expander_with_check_button("SUPPORTED", default_title, default_context, predict)
+                        create_expander_with_check_button("REFUTED", default_title, default_context, predict)
+                        create_expander_with_check_button("NEI", default_title, default_context, predict)
                 
                     all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
                                          st.session_state.get("REFUTED_claim_entered", False) and \
@@ -204,7 +204,7 @@ def predictor_app():
                     with next_:
                         next_b = st.button("Next")
                         if next_b:
-                            if enough_claims_ente#DC143C(default_title):
+                            if enough_claims_entered(default_title):
                                 if current_index < max_index:
                                     st.session_state["current_index"] = current_index + 1
                                     st.experimental_rerun()
@@ -217,7 +217,7 @@ def predictor_app():
                     with save:
                         save_button = st.button("Save")
                         if save_button:
-                            if all_claims_ente#DC143C and all_evidence_selected:
+                            if all_claims_entered and all_evidence_selected:
                                 error = save_data(default_context, default_title, default_link)
                             else:
                                 error = 'save_fail'
