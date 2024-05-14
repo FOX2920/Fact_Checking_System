@@ -29,35 +29,32 @@ def result_form(result):
         st.dataframe(df_styled, hide_index=True, use_container_width=True)
 
 
-
 def create_expander_with_check_button(label, title, context, predict_func):
-    claim_key = f"{label.upper()}_claim_enter"
-    evidence_key = f"{label.upper()}_evidence_selected"
-    claim_input_key = f'{label}_input'
-    label_e_ops = f"{label.upper()}_options"
+    claim_key = f"{label}_input"
+    evidence_key = f"{label}_evidence_selected"
+    label_e_ops = f"{label}_options"
+
+    if label_e_ops not in st.session_state:
+        st.session_state[label_e_ops] = []
 
     annotated_data = st.session_state['annotated_data']
     with st.expander(label, expanded=True):
-        claim = st.text_input(f'Claim {label.upper()}', max_chars=500, key=claim_input_key)
+        claim = st.text_input(f'Claim {label.upper()}', max_chars=500, key=claim_key)
         if claim:
             if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == title))].empty:
                 st.warning(f"This claim with label '{label}' and title '{title}' already exists.")
             else:
                 result = predict_func(context, claim)
                 result_form(result)
+
+                evidence = st.text_input("Enter evidence to be added")
+                if evidence:
+                    if evidence not in st.session_state[label_e_ops]:
+                        st.session_state[label_e_ops].append(evidence)
                 
-                st.session_state[claim_key] = True
-                if 'error' not in result:
-                    if label_e_ops not in st.session_state:
-                        st.session_state[label_e_ops] = []
-                    evidence = st.text_input("Enter evidence to be added")
-                    if evidence != "":
-                        if evidence not in st.session_state.options:
-                            st.session_state.options.append(evidence)
-                        st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
+                st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
         else:
             st.warning("Please enter a claim.")
-            st.session_state[claim_key] = ''
 
 if 'annotated_data' not in st.session_state:
     st.session_state['annotated_data'] = pd.DataFrame(columns=['Username', 'Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
