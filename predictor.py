@@ -4,14 +4,15 @@ from utilities import predict
 
 st.set_page_config(layout="wide")
 
-def result_form(result):
+def result_form(result, label):
     if 'error' in result:
         st.error(result['error'])
     else:
         st.subheader('Label probabilities:')
         labels = ['NEI', 'REFUTED', 'SUPPORTED']
-        probabilities = [result['probabilities'].get(label, 0) for label in labels]
-        df = pd.DataFrame({label: [probabilities[i]] for i, label in enumerate(labels)})
+        probabilities = {lbl: result['probabilities'].get(lbl, 0) for lbl in labels}
+        
+        df = pd.DataFrame({label: [probabilities[label]] for label in labels})
         
         def apply_background(val, label):
             color = ''
@@ -27,6 +28,8 @@ def result_form(result):
         df_styled = df_styled.format("{:.2%}")
         
         st.dataframe(df_styled, hide_index=True, use_container_width=True)
+        
+        return probabilities[label] < 0.33
 
 
 def create_expander_with_check_button(label, title, context, predict_func):
@@ -46,20 +49,20 @@ def create_expander_with_check_button(label, title, context, predict_func):
                 st.warning(f"This claim with label '{label}' and title '{title}' already exists.")
             else:
                 result = predict_func(context, claim)
-                result_form(result)
+                if result_form(result, label):
+                    evidence = st.text_input("Enter evidence to be added", key=evidence_input_key)
+                    if evidence:
+                        if evidence in context:
+                            if evidence not in st.session_state[label_e_ops]:
+                                st.session_state[label_e_ops].append(evidence)
+                        else:
+                            st.warning("Entered evidence does not appear in the context.")
 
-                evidence = st.text_input("Enter evidence to be added", key=evidence_input_key)
-                if evidence:
-                    if evidence in context:
-                        if evidence not in st.session_state[label_e_ops]:
-                            st.session_state[label_e_ops].append(evidence)
-                    else:
-                        st.warning("Entered evidence does not appear in the context.")
-
-                st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
+                    st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
+                else:
+                    st.warning(f"The predicted probability for label '{label}' is too high. Please modify the claim.")
         else:
             st.warning("Please enter a claim.")
-
 
 
 if 'annotated_data' not in st.session_state:
