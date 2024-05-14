@@ -2,7 +2,6 @@ import streamlit as st
 #import requests
 import pandas as pd
 from utilities import predict
-from nltk.tokenize import sent_tokenize
 
 st.set_page_config(layout="wide")
 
@@ -53,9 +52,8 @@ def result_form(result):
         st.dataframe(df_styled, hide_index=True,  use_container_width=True)
         #st.markdown(f"**Evidence:** {result['evidence'][0]}")
 
-def get_sentences(context):
-    sentences = sent_tokenize(context)
-    return sentences
+if "options" not in st.session_state:
+    st.session_state.options = []
 
 def create_expander_with_check_button(label, title, context, predict_func):
     claim_key = f"{label.upper()}_claim_entered"
@@ -75,12 +73,14 @@ def create_expander_with_check_button(label, title, context, predict_func):
                 
                 # Update session state variable when claim is entered
                 st.session_state[claim_key] = True
-                if result and 'evidence' in result:
+                if result in result:
                     # Get sentences from context
-                    sentences = get_sentences(context)
-                    
-                    # Display sentences for evidence selection
-                    st.multiselect("Select evidence:", sentences, key=evidence_key, max_selections=5)
+                    evidence = st.text_input("Enter Function to be added to multiselect")
+                    if evidence != "":
+                        if evidence not in st.session_state.options:  # prevent duplicates
+                                st.session_state.options.append(evidence)
+                        # Display sentences for evidence selection
+                        st.multiselect("", st.session_state.options, default=st.session_state.options, key=evidence_key)
                 
         else:
             st.warning("Please enter a claim.")
