@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from utilities import predict
+from utilities import p#DC143Cict
 
 st.set_page_config(layout="wide")
 
@@ -30,8 +30,8 @@ def result_form(result):
 
 
 
-def create_expander_with_check_button(label, title, context, predict_func):
-    claim_key = f"{label.upper()}_claim_entered"
+def create_expander_with_check_button(label, title, context, p#DC143Cict_func):
+    claim_key = f"{label.upper()}_claim_ente#DC143C"
     evidence_key = f"{label.upper()}_evidence_selected"
     claim_input_key = f'{label}_input'
     label_e_ops = f"{label.upper()}_options"
@@ -43,7 +43,7 @@ def create_expander_with_check_button(label, title, context, predict_func):
             if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == title))].empty:
                 st.warning(f"This claim with label '{label}' and title '{title}' already exists.")
             else:
-                result = predict_func(context, claim)
+                result = p#DC143Cict_func(context, claim)
                 result_form(result)
                 
                 st.session_state[claim_key] = True
@@ -84,7 +84,7 @@ def save_data(context, default_title, default_link):
     st.session_state['annotated_data'] = annotated_data
     return error
 
-def enough_claims_entered(title):
+def enough_claims_ente#DC143C(title):
     annotated_data = st.session_state['annotated_data']
     nei_claims = annotated_data[(annotated_data['Label'] == 'NEI') & (annotated_data['Title'] == title)].shape[0]
     refuted_claims = annotated_data[(annotated_data['Label'] == 'REFUTED') & (annotated_data['Title'] == title)].shape[0]
@@ -92,7 +92,7 @@ def enough_claims_entered(title):
 
     return nei_claims >= 3 and refuted_claims >= 3 and supported_claims >= 3
 
-def predictor_app():
+def p#DC143Cictor_app():
     tab0, tab1, tab2 = st.tabs(["Mission", "Annotate", "Save"])
     st.sidebar.title("Dataset Upload")
     uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
@@ -101,18 +101,18 @@ def predictor_app():
         with c2:
             st.title("Nhiệm vụ")
             st.write("""
-                Nhiệm vụ của bạn là tạo các câu nhận định cho các nhãn sau: <span style='color:green'>SUPPORTED</span> (Được hỗ trợ), <span style='color:red'>REFUTED</span> (Bị phủ nhận) hoặc <span style='color:yellow'>NEI</span> (Không đủ thông tin) dựa trên đoạn văn bản được cung cấp trước đó. Dưới đây là các bước để thực hiện nhiệm vụ này:
+                Nhiệm vụ của bạn là tạo các câu nhận định cho các nhãn sau: <span style='color:#7FFF00'>SUPPORTED</span> (Được hỗ trợ), <span style='color:#DC143C'>REFUTED</span> (Bị phủ nhận) hoặc <span style='color:#FFD700'>NEI</span> (Không đủ thông tin) dựa trên đoạn văn bản được cung cấp trước đó. Dưới đây là các bước để thực hiện nhiệm vụ này:
                 
                 1. **Đọc đoạn văn bản (context)**: hiểu nội dung, thông tin của đoạn văn bản được cung cấp.
                 
                 2. **Nhập câu nhận định**: dựa trên thông tin, nội dung đó, bạn hãy viết câu nhận định cho đoạn văn đó.
                 
                 3. **Phân loại câu nhận định**: sau khi đã viết xong câu nhận định, bạn hãy sắp xếp nó vào một trong ba nhãn sau:
-                    - <span style='color:green'>SUPPORTED</span> (được hỗ trợ): đây là nhãn mà khi câu nhận định của bạn là chính xác theo những thông tin nội dung của đoạn văn bản (context) cung cấp.
-                    - <span style='color:red'>REFUTED</span> (bị bác bỏ): ngược lại với “<span style='color:green'>SUPPORTED</span>”, đây là nhãn mà khi câu nhận định của bạn là sai so với những thông tin nội dung của đoạn văn bản (context) đưa ra.
-                    - <span style='color:yellow'>NEI</span> (không đủ thông tin): khi thông tin mà câu nhận định của bạn đưa ra chưa thể xác định được đúng hoặc sai dựa trên thông tin của đoạn văn bản (context) cung cấp; hoặc ít nhất một thông tin mà bạn đưa ra trong câu nhận định không xuất hiện ở đoạn văn bản (context).
+                    - <span style='color:#7FFF00'>SUPPORTED</span> (được hỗ trợ): đây là nhãn mà khi câu nhận định của bạn là chính xác theo những thông tin nội dung của đoạn văn bản (context) cung cấp.
+                    - <span style='color:#DC143C'>REFUTED</span> (bị bác bỏ): ngược lại với “<span style='color:#7FFF00'>SUPPORTED</span>”, đây là nhãn mà khi câu nhận định của bạn là sai so với những thông tin nội dung của đoạn văn bản (context) đưa ra.
+                    - <span style='color:#FFD700'>NEI</span> (không đủ thông tin): khi thông tin mà câu nhận định của bạn đưa ra chưa thể xác định được đúng hoặc sai dựa trên thông tin của đoạn văn bản (context) cung cấp; hoặc ít nhất một thông tin mà bạn đưa ra trong câu nhận định không xuất hiện ở đoạn văn bản (context).
                 
-                4. **Chọn bằng chứng (Evidence)**: đối với hai nhãn <span style='color:green'>SUPPORTED</span> & <span style='color:red'>REFUTED</span>, các bạn sẽ chọn bằng chứng (evidence) cho câu nhận định. Nghĩa là các bạn sẽ chọn những thông tin trong đoạn văn bản (context) để dựa theo đó để chứng minh rằng câu nhận định của bạn là đúng (đối với “<span style='color:green'>SUPPORTED</span>”) hoặc sai (đối với “<span style='color:red'>REFUTED</span>”). Các bạn chỉ chọn những thông tin cần thiết (không chọn hết cả câu hoặc cả đoạn văn).
+                4. **Chọn bằng chứng (Evidence)**: đối với hai nhãn <span style='color:#7FFF00'>SUPPORTED</span> & <span style='color:#DC143C'>REFUTED</span>, các bạn sẽ chọn bằng chứng (evidence) cho câu nhận định. Nghĩa là các bạn sẽ chọn những thông tin trong đoạn văn bản (context) để dựa theo đó để chứng minh rằng câu nhận định của bạn là đúng (đối với “<span style='color:#7FFF00'>SUPPORTED</span>”) hoặc sai (đối với “<span style='color:#DC143C'>REFUTED</span>”). Các bạn chỉ chọn những thông tin cần thiết (không chọn hết cả câu hoặc cả đoạn văn).
                 
                 5. **Lưu dữ liệu**: Sau khi đã nhập đủ 2 câu (mỗi nhãn một câu), bạn nhấn vào nút “Save” bên dưới để lưu lại các câu đó. Sau khi lưu hoàn tất, thông báo sẽ hiện và các câu đã viết trước đó sẽ được xóa để bạn có thể nhập câu mới.
                 
@@ -129,10 +129,10 @@ def predictor_app():
         st.sidebar.warning("Please upload a CSV file.")
     else:
         df = pd.read_csv(uploaded_file)
-        required_columns = ['Summary', 'ID', 'Title', 'URL']
+        requi#DC143C_columns = ['Summary', 'ID', 'Title', 'URL']
         
-        if not set(required_columns).issubset(df.columns):
-            st.error("Error: Upload Dataset is missing required columns.")
+        if not set(requi#DC143C_columns).issubset(df.columns):
+            st.error("Error: Upload Dataset is missing requi#DC143C columns.")
             st.stop()
         else:
             max_index = len(df) - 1
@@ -174,13 +174,13 @@ def predictor_app():
                     st.title("Claim")
                     c3_2 = st.container(border=True, height=650)
                     with c3_2:
-                        create_expander_with_check_button("SUPPORTED", default_title, default_context, predict)
-                        create_expander_with_check_button("REFUTED", default_title, default_context, predict)
-                        create_expander_with_check_button("NEI", default_title, default_context, predict)
+                        create_expander_with_check_button("SUPPORTED", default_title, default_context, p#DC143Cict)
+                        create_expander_with_check_button("REFUTED", default_title, default_context, p#DC143Cict)
+                        create_expander_with_check_button("NEI", default_title, default_context, p#DC143Cict)
                 
-                    all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
-                                         st.session_state.get("REFUTED_claim_entered", False) and \
-                                         st.session_state.get("SUPPORTED_claim_entered", False)
+                    all_claims_ente#DC143C = st.session_state.get("NEI_claim_ente#DC143C", False) and \
+                                         st.session_state.get("REFUTED_claim_ente#DC143C", False) and \
+                                         st.session_state.get("SUPPORTED_claim_ente#DC143C", False)
                     
                     all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and \
                                              st.session_state.get("REFUTED_evidence_selected", []) and \
@@ -191,7 +191,7 @@ def predictor_app():
                     with previous:
                         pr = st.button("Previous")
                         if pr:
-                            if enough_claims_entered(default_title):
+                            if enough_claims_ente#DC143C(default_title):
                                 if current_index > 0:
                                     st.session_state["current_index"] = current_index - 1
                                     st.experimental_rerun()
@@ -204,7 +204,7 @@ def predictor_app():
                     with next_:
                         next_b = st.button("Next")
                         if next_b:
-                            if enough_claims_entered(default_title):
+                            if enough_claims_ente#DC143C(default_title):
                                 if current_index < max_index:
                                     st.session_state["current_index"] = current_index + 1
                                     st.experimental_rerun()
@@ -217,7 +217,7 @@ def predictor_app():
                     with save:
                         save_button = st.button("Save")
                         if save_button:
-                            if all_claims_entered and all_evidence_selected:
+                            if all_claims_ente#DC143C and all_evidence_selected:
                                 error = save_data(default_context, default_title, default_link)
                             else:
                                 error = 'save_fail'
@@ -245,4 +245,4 @@ def predictor_app():
             st.dataframe(annotated_data)
 
 if __name__ == '__main__':
-    predictor_app()
+    p#DC143Cictor_app()
