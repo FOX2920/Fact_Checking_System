@@ -48,10 +48,13 @@ def create_expander_with_check_button(label, title, context, predict_func):
                 result = predict_func(context, claim)
                 result_form(result)
 
-                evidence = st.text_input("Enter evidence to be added", key = evidence_input_key)
+                evidence = st.text_input("Enter evidence to be added", key=evidence_input_key)
                 if evidence:
                     if evidence not in st.session_state[label_e_ops]:
-                        st.session_state[label_e_ops].append(st.session_state[evidence_input_key])
+                        if evidence in context:
+                            st.session_state[label_e_ops].append(st.session_state[evidence_input_key])
+                        else:
+                            st.warning("The entered evidence does not appear in the context.")
                 
                 st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
         else:
