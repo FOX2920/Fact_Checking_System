@@ -6,7 +6,7 @@ logging.disable(logging.WARNING)
 import torch
 from transformers import AutoModel, AutoTokenizer
 from Mbert import MBERTClassifier
-from evidence_retrieval import evidence_top_n, similarities
+# from evidence_retrieval import evidence_top_n, similarities
 #import gc
 from config import hf_token
 
@@ -25,8 +25,8 @@ def predict(context, claim):
 #    torch.cuda.empty_cache()
 #    torch.cuda.ipc_collect()
 
-    evidence_top5, top5_consine = evidence_top_n(context, claim)
-    evidence_top1, top1_consine, rank_5 = similarities(evidence_top5, claim, top5_consine)
+    # evidence_top5, top5_consine = evidence_top_n(context, claim)
+    # evidence_top1, top1_consine, rank_5 = similarities(evidence_top5, claim, top5_consine)
 
     inputs = tokenizer(context, claim, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
     model.eval()
@@ -44,7 +44,7 @@ def predict(context, claim):
     # Tạo dictionary chứa kết quả
     result = {
         "predicted_label": predicted_label,
-        "evidence": evidence_top1,
+        # "evidence": evidence_top1,
         "probabilities": {
             "SUPPORTED": probabilities_rounded[0],
             "REFUTED": probabilities_rounded[1],
