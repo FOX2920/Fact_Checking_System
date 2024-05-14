@@ -52,8 +52,7 @@ def create_expander_with_check_button(label, title, context, predict_func):
                     if evidence != "":
                         if evidence not in st.session_state.options:
                             st.session_state.options.append(evidence)
-                        selected_evidence = st.multiselect(f"Select evidence for {label}", st.session_state.options, key=evidence_key)
-                        st.session_state[evidence_key] = selected_evidence
+                        st.multiselect(f"Select evidence for {label}", st.session_state.options, default=st.session_state.options, key=evidence_key)
         else:
             st.warning("Please enter a claim.")
             st.session_state[claim_key] = ''
