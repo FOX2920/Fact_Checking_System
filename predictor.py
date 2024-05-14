@@ -30,8 +30,8 @@ def result_form(result):
 
 
 
-def create_expander_with_check_button(label, title, context, p#DC143Cict_func):
-    claim_key = f"{label.upper()}_claim_ente#DC143C"
+def create_expander_with_check_button(label, title, context, predict_func):
+    claim_key = f"{label.upper()}_claim_enter"
     evidence_key = f"{label.upper()}_evidence_selected"
     claim_input_key = f'{label}_input'
     label_e_ops = f"{label.upper()}_options"
@@ -43,7 +43,7 @@ def create_expander_with_check_button(label, title, context, p#DC143Cict_func):
             if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == title))].empty:
                 st.warning(f"This claim with label '{label}' and title '{title}' already exists.")
             else:
-                result = p#DC143Cict_func(context, claim)
+                result = predict_func(context, claim)
                 result_form(result)
                 
                 st.session_state[claim_key] = True
@@ -84,7 +84,7 @@ def save_data(context, default_title, default_link):
     st.session_state['annotated_data'] = annotated_data
     return error
 
-def enough_claims_ente#DC143C(title):
+def enough_claims_entered(title):
     annotated_data = st.session_state['annotated_data']
     nei_claims = annotated_data[(annotated_data['Label'] == 'NEI') & (annotated_data['Title'] == title)].shape[0]
     refuted_claims = annotated_data[(annotated_data['Label'] == 'REFUTED') & (annotated_data['Title'] == title)].shape[0]
@@ -92,7 +92,7 @@ def enough_claims_ente#DC143C(title):
 
     return nei_claims >= 3 and refuted_claims >= 3 and supported_claims >= 3
 
-def p#DC143Cictor_app():
+def predictor_app():
     tab0, tab1, tab2 = st.tabs(["Mission", "Annotate", "Save"])
     st.sidebar.title("Dataset Upload")
     uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
@@ -178,9 +178,9 @@ def p#DC143Cictor_app():
                         create_expander_with_check_button("REFUTED", default_title, default_context, p#DC143Cict)
                         create_expander_with_check_button("NEI", default_title, default_context, p#DC143Cict)
                 
-                    all_claims_ente#DC143C = st.session_state.get("NEI_claim_ente#DC143C", False) and \
-                                         st.session_state.get("REFUTED_claim_ente#DC143C", False) and \
-                                         st.session_state.get("SUPPORTED_claim_ente#DC143C", False)
+                    all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
+                                         st.session_state.get("REFUTED_claim_entered", False) and \
+                                         st.session_state.get("SUPPORTED_claim_entered", False)
                     
                     all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and \
                                              st.session_state.get("REFUTED_evidence_selected", []) and \
@@ -191,7 +191,7 @@ def p#DC143Cictor_app():
                     with previous:
                         pr = st.button("Previous")
                         if pr:
-                            if enough_claims_ente#DC143C(default_title):
+                            if enough_claims_entered(default_title):
                                 if current_index > 0:
                                     st.session_state["current_index"] = current_index - 1
                                     st.experimental_rerun()
@@ -245,4 +245,4 @@ def p#DC143Cictor_app():
             st.dataframe(annotated_data)
 
 if __name__ == '__main__':
-    p#DC143Cictor_app()
+    predictor_app()
