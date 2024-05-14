@@ -28,13 +28,13 @@ def result_form(result):
         
         st.dataframe(df_styled, hide_index=True, use_container_width=True)
 
-if "options" not in st.session_state:
-    st.session_state.options = []
+
 
 def create_expander_with_check_button(label, title, context, predict_func):
     claim_key = f"{label.upper()}_claim_entered"
     evidence_key = f"{label.upper()}_evidence_selected"
     claim_input_key = f'{label}_input'
+    label_e_ops = f"{label.upper()}_options"
 
     annotated_data = st.session_state['annotated_data']
     with st.expander(label, expanded=True):
@@ -48,11 +48,13 @@ def create_expander_with_check_button(label, title, context, predict_func):
                 
                 st.session_state[claim_key] = True
                 if 'error' not in result:
+                    if label_e_ops not in st.session_state:
+                        st.session_state[label_e_ops] = []
                     evidence = st.text_input("Enter evidence to be added")
                     if evidence != "":
                         if evidence not in st.session_state.options:
                             st.session_state.options.append(evidence)
-                        st.multiselect(f"Select evidence for {label}", st.session_state.options, default=st.session_state.options, key=evidence_key)
+                        st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
         else:
             st.warning("Please enter a claim.")
             st.session_state[claim_key] = ''
