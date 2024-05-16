@@ -32,7 +32,6 @@ modelname = "SonFox2920/MBert_FC" # Model bert đã dc fine-tune
 tokenizer = AutoTokenizer.from_pretrained(modelname, token=hf_token)
 mbert = AutoModel.from_pretrained(modelname, token=hf_token).to(device)
 model = MBERTClassifier(mbert, num_classes=3).to(device)
-model.load_state_dict(torch.load('Model/checkpoint.pt', map_location=device))
 
 # Hàm để dự đoán nhãn
 def predict(context, claim):
