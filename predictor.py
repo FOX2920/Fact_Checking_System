@@ -57,8 +57,7 @@ def create_expander_with_check_button(label, title, context, predict_func):
                                 st.session_state[label_e_ops].append(evidence)
                         else:
                             st.warning("Entered evidence does not appear in the context.")
-
-                    st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
+                        st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
                 else:
                     st.warning(f"The predicted probability for label '{label}' is too high. Please modify the claim.")
         else:
