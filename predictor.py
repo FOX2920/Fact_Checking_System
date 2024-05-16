@@ -29,7 +29,7 @@ def result_form(result, label):
         
         st.dataframe(df_styled, hide_index=True, use_container_width=True)
         
-        return probabilities[label] < 0.33
+        return probabilities[label] < 0.35
 
 
 def create_expander_with_check_button(label, title, context, predict_func):
