@@ -9,7 +9,7 @@ def result_form(result, label):
         st.error(result['error'])
     else:
         st.subheader('Label probabilities:')
-        labels = ['NEI', 'REFUTED', 'SUPPORTED']
+        labels = ['SUPPORTED', 'REFUTED', 'NEI']
         probabilities = {lbl: result['probabilities'].get(lbl, 0) for lbl in labels}
         
         df = pd.DataFrame({label: [probabilities[label]] for label in labels})
