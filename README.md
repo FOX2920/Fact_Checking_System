@@ -15,7 +15,7 @@ This project is designed to facilitate the collection of data for adversarial fa
 
 ### Prerequisites
 
-- Python 3.7 or higher
+- Python 3.10 or higher
 - pip (Python package installer)
 - Virtual environment tool (optional but recommended)
 
