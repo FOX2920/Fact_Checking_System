@@ -1,95 +1,96 @@
-# Fact-Checking System
 
-This is a Fact-Checking System designed to classify claims into three categories: SUPPORTED, REFUTED, and NEI (Not Enough Information). It provides predictions based on a given context and claim, using a pre-trained multilingual BERT model.
+# Project Title
+
+Fact-Checking Application
 
 ## Overview
 
-The system consists of three main components:
+This project aims to provide a tool for fact-checking claims against a given context. The application leverages machine learning models to predict whether a claim is supported, refuted, or not enough information (NEI) is available based on the provided context.
 
-1. **API Server (`api.py`):** This component serves as the backend, providing an API endpoint for making predictions. It uses Flask for handling HTTP requests and MongoDB for storing prediction data.
+## Features
 
-2. **Streamlit Predictor (`predictor.py`):** This is the frontend component where users can input context and claims, and get predictions interactively. It utilizes Streamlit for creating a user-friendly interface.
+- Predict the status of a claim as Supported, Refuted, or NEI.
+- Display label probabilities in a visually intuitive format.
+- Allow users to input claims and contexts through a web interface.
+- Save and display annotated data.
 
-3. **Utilities (`utilities.py`):** This module contains utility functions for preprocessing data, making predictions using the BERT model, and retrieving evidence from the context.
-
-## Setup
+## Installation
 
 ### Prerequisites
 
-- Python 3.x
-- Flask
-- pymongo
-- requests
-- Streamlit
-- Transformers (from Hugging Face)
+- Python 3.7 or higher
+- pip (Python package installer)
+- Virtual environment tool (optional but recommended)
 
-### Installation
+### Setting up the environment
 
-1. Clone this repository to your local machine.
-
-    ```bash
-    git clone https://github.com/FOX2920/Fact_Checking_System.git
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/your-repo/fact-checking-app.git
+    cd fact-checking-app
     ```
 
-2. Install the required Python dependencies.
+2. Create a virtual environment:
+    ```sh
+    python -m venv venv
+    ```
 
-    ```bash
-    cd <path/to/folder>Fact_Checking_System
+3. Activate the virtual environment:
+    - On Windows:
+      ```sh
+      .\venv\Scripts\activate
+      ```
+    - On macOS and Linux:
+      ```sh
+      source venv/bin/activate
+      ```
+
+4. Install the required packages:
+    ```sh
     pip install -r requirements.txt
     ```
 
-3. Download the pre-trained multilingual BERT model and place it in the `Model` directory. You can download the model from the Hugging Face model hub or use any other compatible model.
-
-### Running the Application
-
-1. Start the API server.
-
-    ```bash
-    python api.py
-    ```
-
-2. Run the Streamlit predictor.
-
-    ```bash
-    streamlit run predictor.py
-    ```
-
-3. Open your web browser and navigate to `http://localhost:8501` to access the Streamlit app.
-
-## Dockerization
-
-A Dockerfile has been added to simplify deployment of the Fact-Checking System.
-
-### Building the Docker Image
-
-To build the Docker image, navigate to the root directory of the project where the Dockerfile is located and run the following command:
-
-```bash
-docker build -t Fact-Checking-System .
-```
-
-### Running the Docker Container
-Once the image is built, you can run the Docker container with the following command:
-```bash
-docker run -p 8501:8501 fact-checking-system
-```
-This will start the containerized application, and you can access it through `http://localhost:8501` in your web browser.
+5. Download the model checkpoint file from Google Drive and place it in the `Model` folder:
+    1. Go to [Google Drive](https://drive.google.com/drive/u/0/folders/1zAjAad5J3obOJgioptqEcA-Ta9l5OTul?fbclid=IwAR0Qskn-DcTTrN_LhRd6uRs1LPwjhe5fjDWJuXEay9iuW07TKeijV3lDrJU).
+    2. Download the file `Checkpoint.pt`.
+    3. Create a `Model` folder in the project directory if it doesn't exist:
+       ```sh
+       mkdir Model
+       ```
+    4. Move the downloaded `Checkpoint.pt` file into the `Model` folder.
 
 ## Usage
 
-1. Input the context and claim in the respective fields provided by the Streamlit interface.
-2. Click on the appropriate button to check the claim based on the specified label (NEI, REFUTED, or SUPPORTED).
-3. View the prediction result, including the predicted label, probabilities, and evidence supporting the prediction.
+1. Run the Streamlit application:
+    ```sh
+    streamlit run predictor.py
+    ```
 
-## Contributing
+2. Open your web browser and navigate to `http://localhost:8501` to use the application.
 
-Contributions are welcome! If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.
+## Files Description
+
+- **utilities.py**: Contains utility functions for setting the seed, loading the model, and predicting the status of claims based on the context.
+- **predictor.py**: Implements the Streamlit web application for user interaction.
+
+## Functions
+
+### utilities.py
+
+- **set_seed(seed)**: Sets the seed for reproducibility.
+- **predict(context, claim)**: Predicts the status of a claim against the given context.
+
+### predictor.py
+
+- **result_form(result, user_label)**: Displays the prediction results in a styled dataframe.
+- **create_expander_with_check_button(label, title, context, predict_func)**: Creates an expander with a check button for user input.
+- **predictor_app()**: Main function to run the Streamlit app.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgements
+## Acknowledgments
 
-- This project utilizes the Transformers library by Hugging Face for working with pre-trained BERT models.
-- Special thanks to the creators and contributors of Flask, Streamlit, and MongoDB for providing the tools necessary for building this system.
+- Hugging Face Transformers
+- Streamlit
