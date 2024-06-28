@@ -1,9 +1,8 @@
-
-# Fact-Checking Application
+# Fact-Checking Data Collection Application
 
 ## Overview
 
-This project aims to provide a tool for fact-checking claims against a given context. The application leverages machine learning models to predict whether a claim is supported, refuted, or not enough information (NEI) is available based on the provided context.
+This project is designed to facilitate the collection of data for adversarial fact-checking. The application allows users to input claims and contexts, and then uses machine learning models to predict whether a claim is supported, refuted, or if there is not enough information (NEI). 
 
 ## Features
 
@@ -24,8 +23,8 @@ This project aims to provide a tool for fact-checking claims against a given con
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/your-repo/fact-checking-app.git
-    cd fact-checking-app
+    git clone https://github.com/FOX2920/Fact_Checking_System.git
+    cd path/to/Fact_Checking_System-main
     ```
 
 2. Create a virtual environment:
@@ -36,7 +35,7 @@ This project aims to provide a tool for fact-checking claims against a given con
 3. Activate the virtual environment:
     - On Windows:
       ```sh
-      .\venv\Scripts\activate
+      .\\venv\\Scripts\\activate
       ```
     - On macOS and Linux:
       ```sh
