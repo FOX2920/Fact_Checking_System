@@ -7,10 +7,11 @@ import torch
 import numpy as np
 import random
 from transformers import AutoModel, AutoTokenizer
-from Mbert import MBERTClassifier
-# from evidence_retrieval import evidence_top_n, similarities
-#import gc
+from Mbert import MBERTClassifier, SentencePairDataset
+from torch.utils.data import DataLoader
+from evidence_retrieval import evidence_top_n, similarities
 from config import hf_token
+import pandas as pd
 
 # Thiết lập seed cố định
 def set_seed(seed):
@@ -25,49 +26,68 @@ def set_seed(seed):
 
 # Gọi hàm set_seed với seed cố định, ví dụ: 42
 set_seed(42)
-
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = torch.device("cpu")
-modelname = "SonFox2920/MBert_FC" # Model bert đã dc fine-tune
+modelname = "SonFox2920/MBert_FC"
 tokenizer = AutoTokenizer.from_pretrained(modelname, token=hf_token)
 mbert = AutoModel.from_pretrained(modelname, token=hf_token).to(device)
 model = MBERTClassifier(mbert, num_classes=3).to(device)
+model.load_state_dict(torch.load('Model/checkpoint.pt', map_location=device))
 
-# Hàm để dự đoán nhãn
 def predict(context, claim):
+    data = pd.DataFrame([{'context': context, 'claim': claim}])
 
-    # gc.collect()
-    # torch.cuda.empty_cache()
-    # torch.cuda.ipc_collect()
+    list_evidence_top5 = []
+    list_evidence_top1 = []
 
-    # evidence_top5, top5_consine = evidence_top_n(context, claim)
-    # evidence_top1, top1_consine, rank_5 = similarities(evidence_top5, claim, top5_consine)
+    for i in range(len(data)):
+        statement = data.claim[i]
+        context = data.context[i]
+        evidence_top5, top5_consine = evidence_top_n(context, statement)
+        evidence_top1, top1_consine, rank_5 = similarities(evidence_top5, statement, top5_consine)
+        evidence_top1 = "".join(evidence_top1)
+        list_evidence_top5.append(rank_5)
+        list_evidence_top1.append(evidence_top1)
 
-    inputs = tokenizer(context, claim, return_tensors="pt", padding=True, truncation=True, max_length=512).to(device)
+    data['evidence_top5'] = list_evidence_top5
+    data['evidence'] = list_evidence_top1
+
+    X1_pub_test = data['claim']
+    X2_pub_test = data['context']
+    X_pub_test = [(X1_pub_test, X2_pub_test) for (X1_pub_test, X2_pub_test) in zip(X1_pub_test, X2_pub_test)]
+    y_pub_test = [1]
+
+    test_dataset = SentencePairDataset(X_pub_test, y_pub_test, tokenizer, 256)
+    test_loader_pub = DataLoader(test_dataset, batch_size=1)
+
     model.eval()
-    with torch.no_grad():
-        outputs = model(inputs["input_ids"], inputs["attention_mask"])
-        logits = outputs
-        probabilities = torch.softmax(logits, dim=-1)
-        predicted_label_index = torch.argmax(logits, dim=1)
-        label = ["SUPPORTED", "REFUTED", "NEI"]
-        predicted_label = label[predicted_label_index.item()]
+    predictions = []
+    probabilities = []
 
-    # Làm tròn phần trăm đến 2 chữ số thập phân
-    probabilities_rounded = [round(float(prob), 2) for prob in probabilities[0]]
+    for batch in test_loader_pub:
+        input_ids = batch["input_ids"].to(device)
+        attention_mask = batch["attention_mask"].to(device)
+        with torch.no_grad():
+            outputs = model(input_ids, attention_mask)
+            probs = torch.nn.functional.softmax(outputs, dim=1)
+            predicted = torch.argmax(outputs, dim=1)
+            predictions.extend(predicted.cpu().numpy().tolist())
+            probabilities.extend(probs.cpu().numpy().tolist())
 
-    # Tạo dictionary chứa kết quả
+    data['verdict'] = predictions
+    data['verdict'] = data['verdict'].replace(0, "SUPPORTED")
+    data['verdict'] = data['verdict'].replace(1, "REFUTED")
+    data['verdict'] = data['verdict'].replace(2, "NEI")
+
     result = {
-        "predicted_label": predicted_label,
-        # "evidence": evidence_top1,
-        "probabilities": {
-            "SUPPORTED": probabilities_rounded[0],
-            "REFUTED": probabilities_rounded[1],
-            "NEI": probabilities_rounded[2]
+        'verdict': data['verdict'][0],
+        'evidence': data['evidence'][0],
+        'probabilities': {
+            'SUPPORTED': probabilities[0][0],
+            'REFUTED': probabilities[0][1],
+            'NEI': probabilities[0][2]
         }
     }
-
-    # Convert dictionary thành JSON và trả về
+    
     return result
 
 # # Set default context and claim
