@@ -1,7 +1,5 @@
 
-# Project Title
-
-Fact-Checking Application
+# Fact-Checking Application
 
 ## Overview
 
