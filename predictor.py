@@ -4,16 +4,16 @@ from utilities import predict
 
 st.set_page_config(layout="wide")
 
-def result_form(result, label):
+def result_form(result, user_label):
     if 'error' in result:
         st.error(result['error'])
     else:
         st.subheader('Label probabilities:')
         labels = ['SUPPORTED', 'REFUTED', 'NEI']
         probabilities = {lbl: result['probabilities'].get(lbl, 0) for lbl in labels}
-        
+
         df = pd.DataFrame({label: [probabilities[label]] for label in labels})
-        
+
         def apply_background(val, label):
             color = ''
             if label == 'NEI':
@@ -23,14 +23,14 @@ def result_form(result, label):
             else:  # Supported
                 color = '#7FFF00'
             return f'background-color: {color}; color: black'
-        
+
         df_styled = df.style.apply(lambda x: [apply_background(x[name], name) for name in df.columns], axis=1)
         df_styled = df_styled.format("{:.2%}")
-        
-        st.dataframe(df_styled, hide_index=True, use_container_width=True)
-        
-        return probabilities[label] < 0.35
 
+        st.dataframe(df_styled, hide_index=True, use_container_width=True)
+
+        predicted_label = max(probabilities, key=probabilities.get)
+        return probabilities[user_label] < 0.35 or predicted_label != user_label
 
 def create_expander_with_check_button(label, title, context, predict_func):
     claim_key = f"{label}_input"
@@ -59,7 +59,7 @@ def create_expander_with_check_button(label, title, context, predict_func):
                             st.warning("Entered evidence does not appear in the context.")
                         st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
                 else:
-                    st.warning(f"The predicted probability for label '{label}' is too high. Please modify the claim.")
+                    st.warning(f"The predicted probability for label '{label}' is too high or the predicted label is different. Please modify the claim.")
         else:
             st.warning("Please enter a claim.")
 
