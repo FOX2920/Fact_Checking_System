@@ -63,14 +63,12 @@ def create_expander_with_check_button(label, title, context, predict_func):
         else:
             st.warning("Please enter a claim.")
 
-
 if 'annotated_data' not in st.session_state:
-    st.session_state['annotated_data'] = pd.DataFrame(columns=['Username', 'Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
+    st.session_state['annotated_data'] = pd.DataFrame(columns=['Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
 
 annotated_data = st.session_state['annotated_data']
 
 def save_data(context, default_title, default_link):
-    username = st.session_state.get("username", "admin")
     annotated_data = st.session_state['annotated_data']
     error = 'success'
     
@@ -84,7 +82,7 @@ def save_data(context, default_title, default_link):
             if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == default_title))].empty:
                 error = 'duplicate'
             else:
-                annotated_data.loc[len(annotated_data)] = [username, context, claim, label, evidence, default_title, default_link]
+                annotated_data.loc[len(annotated_data)] = [context, claim, label, evidence, default_title, default_link]
     
     st.session_state['annotated_data'] = annotated_data
     return error
