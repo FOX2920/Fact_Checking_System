@@ -121,8 +121,6 @@ def predictor_app():
                 
                 6. **Di chuyển đến đoạn văn bản (context) khác**: bạn có thể di chuyển qua lại giữa các context nhưng chỉ khi bạn đã tạo tối thiểu 6 câu nhận định (mỗi nhãn tối thiểu 2 câu).
                 
-                7. **Đóng ứng dụng**: Khi muốn kết thúc phiên làm việc, bạn ấn nút Close để đóng ứng dụng. Nhớ save lại (bước 5) trước khi thoát nhé! ❤️
-                
                 Xem chi tiết hướng dẫn cách đặt câu nhận định [tại đây](https://docs.google.com/document/d/121GHPAOFa4_fhmXDGJFYCrmsStcXYc7H/edit).
                 
                 Lấy các đoạn văn bản (context): [tại đây](https://drive.google.com/drive/folders/1bbW7qiglBZHvGs5oNF-s_eac09t5oWOW).
@@ -224,12 +222,6 @@ def predictor_app():
                                 error = save_data(default_context, default_title, default_link)
                             else:
                                 error = 'save_fail'
-    
-                    with close:
-                        cl = st.button("Close")
-                        if cl:
-                            st.session_state["authenticated"] = False
-                            st.experimental_rerun()
     
                     if error == 'success':
                          st.success("Data saved successfully.")
