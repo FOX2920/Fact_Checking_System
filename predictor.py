@@ -50,18 +50,16 @@ def create_expander_with_check_button(label, title, context, predict_func):
             else:
                 result = predict_func(context, claim)
                 if result_form(result, label):
-                    evidence = st.text_input("Enter evidence to be added", key=evidence_input_key)
-                    if evidence:
-                        if evidence in context:
-                            if evidence not in st.session_state[label_e_ops]:
-                                st.session_state[label_e_ops].append(evidence)
-                        else:
-                            st.warning("Entered evidence does not appear in the context.")
-                        st.multiselect(f"Select evidence for {label}", st.session_state[label_e_ops], default=st.session_state[label_e_ops], key=evidence_key)
+                    if label != 'NEI':  # NEI does not require evidence
+                        # Display available sentences as options
+                        sentences = context.split('.')
+                        sentences = [sentence.strip() for sentence in sentences if sentence.strip()]
+                        st.multiselect(f"Selected evidence for {label}", sentences, default=st.session_state[label_e_ops], key=evidence_key)
                 else:
                     st.warning(f"The predicted probability for label '{label}' is too high or the predicted label is different. Please modify the claim.")
         else:
             st.warning("Please enter a claim.")
+
 
 if 'annotated_data' not in st.session_state:
     st.session_state['annotated_data'] = pd.DataFrame(columns=['Context', 'Claim', 'Label', 'Evidence', 'Title', 'Link'])
@@ -79,6 +77,8 @@ def save_data(context, default_title, default_link):
         if st.session_state.get(claim_key, ''):
             claim = st.session_state[claim_key]
             evidence = st.session_state.get(evidence_key, [])
+            if label == 'NEI':
+                evidence = []  # No evidence required for NEI
             if not annotated_data[((annotated_data['Claim'] == claim) & (annotated_data['Label'] == label) & (annotated_data['Title'] == default_title))].empty:
                 error = 'duplicate'
             else:
@@ -93,7 +93,7 @@ def enough_claims_entered(title):
     refuted_claims = annotated_data[(annotated_data['Label'] == 'REFUTED') & (annotated_data['Title'] == title)].shape[0]
     supported_claims = annotated_data[(annotated_data['Label'] == 'SUPPORTED') & (annotated_data['Title'] == title)].shape[0]
 
-    return nei_claims >= 3 and refuted_claims >= 3 and supported_claims >= 3
+    return nei_claims >= 2 and refuted_claims >= 2 and supported_claims >= 2
 
 def predictor_app():
     tab0, tab1, tab2 = st.tabs(["Mission", "Annotate", "Save"])
@@ -133,7 +133,7 @@ def predictor_app():
         require_columns = ['Summary', 'ID', 'Title', 'URL']
         
         if not set(require_columns).issubset(df.columns):
-            st.error("Error: Upload Dataset is missing require columns.")
+            st.error("Error: Upload Dataset is missing required columns.")
             st.stop()
         else:
             max_index = len(df) - 1
@@ -178,15 +178,21 @@ def predictor_app():
                         create_expander_with_check_button("SUPPORTED", default_title, default_context, predict)
                         create_expander_with_check_button("REFUTED", default_title, default_context, predict)
                         create_expander_with_check_button("NEI", default_title, default_context, predict)
-                
-                    all_claims_entered = st.session_state.get("NEI_claim_entered", False) and \
-                                         st.session_state.get("REFUTED_claim_entered", False) and \
-                                         st.session_state.get("SUPPORTED_claim_entered", False)
+
+                    # Update session state to track if claims and evidence are entered
+                    st.session_state["NEI_claim_entered"] = bool(st.session_state.get("NEI_input", ''))
+                    st.session_state["REFUTED_claim_entered"] = bool(st.session_state.get("REFUTED_input", ''))
+                    st.session_state["SUPPORTED_claim_entered"] = bool(st.session_state.get("SUPPORTED_input", ''))
+                    st.session_state["REFUTED_evidence_entered"] = bool(st.session_state.get("REFUTED_evidence_selected", []))
+                    st.session_state["SUPPORTED_evidence_entered"] = bool(st.session_state.get("SUPPORTED_evidence_selected", []))
                     
-                    all_evidence_selected = (st.session_state.get("NEI_evidence_selected", []) and \
-                                             st.session_state.get("REFUTED_evidence_selected", []) and \
-                                             st.session_state.get("SUPPORTED_evidence_selected", []))
+                    all_claims_entered = st.session_state["NEI_claim_entered"] and \
+                                         st.session_state["REFUTED_claim_entered"] and \
+                                         st.session_state["SUPPORTED_claim_entered"]
                     
+                    all_evidence_selected = st.session_state["REFUTED_evidence_entered"] and \
+                                            st.session_state["SUPPORTED_evidence_entered"]
+
                     previous, next_, save, close = st.columns(4)
                     error = ''
                     with previous:
@@ -224,11 +230,11 @@ def predictor_app():
                                 error = 'save_fail'
     
                     if error == 'success':
-                         st.success("Data saved successfully.")
+                        st.success("Data saved successfully.")
                     elif error == 'duplicate':
                         st.warning(f"Maybe one of these claims with title '{default_title}' already exists.")
                     elif error == 'n_enough':
-                         st.warning("Enter at least three claims for each label for this title before navigating.")
+                        st.warning("Enter at least two claims for each label for this title before navigating.")
                     else:
                         st.warning("Please enter all claims and select all evidence before saving.")
     
